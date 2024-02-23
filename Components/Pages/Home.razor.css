@@ -1,0 +1,47 @@
+﻿.container {
+    max-width: 960px;
+    margin: auto;
+    padding: 2rem;
+}
+
+h1 {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3; /* A deep blue, adjust according to your theme */
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-family: 'Roboto', sans-serif;
+    color: #02457a; /* A slightly darker shade for subheadings */
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+p {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #333; /* Dark grey for readability */
+    margin-bottom: 1rem;
+}
+
+a {
+    color: #007bff; /* Bootstrap's default blue for links */
+    text-decoration: none; /* Optional: removes underline from links */
+}
+
+    a:hover {
+        text-decoration: underline; /* Restores underline on hover for clarity */
+    }
+
+strong {
+    color: #000; /* Optional: makes bold text stand out more */
+}
+
+/* Additional styling for responsiveness and aesthetics */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+}

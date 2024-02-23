@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+        <!-- Footer -->
+        <footer class="footer mt-auto py-3 bg-ligh">
+            <div class="container">
+                <p class="disclaimer">Disclaimer: Important Notice: This application is developed exclusively for <strong>Excelligence</strong> and its employees. Unauthorized access or use of this tool is strictly prohibited.</p>
+                <p>&copy; @DateTime.Now.Year Excelligence Learning Corporation. All rights reserved. <span class="registered-trademark">®</span></p>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>

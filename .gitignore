@@ -1,0 +1,14 @@
+.vs/
+.vscode/
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.pidb
+*.booproj
+*.dll
+*.exe
+*.pdb
+*.mdb
