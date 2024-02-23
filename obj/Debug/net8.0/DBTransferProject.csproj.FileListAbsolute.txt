@@ -50,3 +50,4 @@ C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferPro
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\ref\DBTransferProject.dll
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Upload.razor.rz.scp.css
+C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.sourcelink.json
