@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="DBTransferProject.styles.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <script src="_framework/blazor.web.js"></script>
+    <script>
+        function toggleNav() {
+            var nav = document.querySelector('.nav-scrollable');
+            var display = window.getComputedStyle(nav).display;
+            nav.style.display = display === 'none' ? 'block' : 'none';
+        }
+
+    </script>
+    <script>
+        function updateWindowSize() {
+            document.getElementById('width').textContent = window.innerWidth;
+            document.getElementById('height').textContent = window.innerHeight;
+        }
+
+        // Update on window resize
+        window.addEventListener('resize', updateWindowSize);
+
+        // Update on load
+        window.addEventListener('load', updateWindowSize);
+    </script>
+
+</body>
+
+</html>

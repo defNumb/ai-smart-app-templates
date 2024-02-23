@@ -1,0 +1,111 @@
+﻿@page "/onboarding"
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Http
+@using System.IO
+@using OfficeOpenXml;
+@using System.Linq;
+@using System.Text;
+@using AutoMapper;
+
+@*
+  *********** DATA UPLOAD COMPONENT *****************
+  Developed by: Sam Espinoza
+  Company: Excelligence Learning Corp.
+  Last worked on by: Sam Espinoza     <--- update this when you change something
+  Last date worked on: 2/8/2024       <--- update this accordingly
+
+  This component allows users to input database connection details, select a file (CSV or Excel), and upload it for processing.
+  "Upload.razor" contains the HTML (front end code) of this page (Upload).
+  "Upload.razor.cs" contains the Logic (back end code) of this page.
+*@
+
+
+<PageTitle>Onboarding</PageTitle>
+<h3>Start Onboarding</h3>
+<p style="word-wrap: break-word; max-width: 100%">Welcome to the <strong>Client Onboarding Portal</strong>, designed to streamline the setup for the <strong>punchout process</strong> for new clients. This intuitive interface simplifies the onboarding journey, requiring no manual database specifications as all necessary databases are <strong>pre-configured</strong>. For added convenience, a <strong>Database Connection Test Tool</strong> is available, allowing you to verify connectivity effortlessly (optional). </p>
+<div style="display: flex; justify-content: space-between; align-items: start; width: 100%; margin-bottom: 20px;">
+
+    <!-- File Selectors on the left -->
+    <div style="padding: 20px;">
+        <div style="padding: 20px; background-color: #f5f5f5; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" class="form-group">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 18px;">Select a file to upload (Excel):</label>
+            <InputFile OnChange="HandleFileSelected" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <!--
+        <div style="padding: 10px;" class="form-group">
+            <label>Select an image to upload:</label>
+            <InputFile OnChange="HandleImageSelected"/>
+        </div> -->
+        <!-- Button to trigger the file upload process after all necessary information has been provided. -->
+        <button class="btn btn-primary" style="margin-top: 15px;" @onclick="UploadFile">Upload</button>
+    </div>
+
+    <!-- Optional Input Fields on the right -->
+    <div style="width: 300px; height: 400px; border: 1px solid black; box-shadow: 0px 0px 10px rgba(0,0,0,0.5); padding: 10px; display: flex; flex-direction: column; justify-content: start; align-items: center;">
+        <h3 style="margin-top: 0; margin-bottom: 5px;">Test Database Connection <span style="font-size: smaller; color: red;">*optional</span></h3>
+        <div class="form-group" style="padding: 5px; width: 100%;">
+            <label for="serverName">Server Name:</label>
+            <input @bind="serverName" class="form-control" id="serverName" placeholder="Enter server name" style="margin-bottom: 5px;" />
+        </div>
+        <div class="form-group" style="padding: 5px; width: 100%;">
+            <label for="databaseName">Database Name:</label>
+            <input @bind="databaseName" class="form-control" id="databaseName" placeholder="Enter database name" style="margin-bottom: 5px;" />
+        </div>
+        <div class="form-group" style="padding: 5px; width: 100%;">
+            <label for="tableName">Table Name: <span style="font-size: smaller; color: red;">*optional*</span></label>
+            <input @bind="tableName" class="form-control" id="tableName" placeholder="Enter table name" style="margin-bottom: 5px;" />
+        </div>
+        <button class="btn btn-secondary" style="margin-top: 5px;" @onclick="TestDatabaseConnection">Test Connection</button>
+    </div>
+
+</div>
+
+@* Conditionally rendered message box to display the output of the upload process or any errors encountered. *@
+@if (!string.IsNullOrEmpty(filePreview))
+{
+    <div class="mt-3" style="margin: 20px auto; padding: 15px; max-width: 80vw; background-color: #f0f0f0; color: #333; box-sizing: border-box; overflow-x: auto; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <label style="margin-bottom: 10px; display: block; font-weight: bold; color: #0056b3;">File Preview:</label>
+        <div class="form-control preview-console" style="white-space: pre-wrap; background-color: #f0f0f0; color: #333; border: 1px solid #ccc; overflow-x: auto; font-family: 'Consolas', 'Courier New', monospace; border-radius: 4px;">
+            @((MarkupString)filePreview)
+        </div>
+    </div>
+}
+@if (!string.IsNullOrEmpty(userMessage))
+{
+    <div class="mt-3" style="margin: 20px auto; padding: 15px; max-width: 80vw; background-color: #f0f0f0; color: #333; box-sizing: border-box; overflow-x: auto; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <label style="margin-bottom: 10px; display: block; font-weight: bold; color: #0056b3;">Generated Records:</label>
+        <div class="form-control preview-console" style="white-space: pre-wrap; background-color: #f0f0f0; color: #333; border: 1px solid #ccc; overflow-x: auto; font-family: 'Consolas', 'Courier New', monospace; border-radius: 4px;">
+            @((MarkupString)userMessage)
+        </div>
+    </div>
+}
+
+
+@if (userMessages.Any())
+{
+    <div class="mt-3" style="margin: 20px auto; padding: 15px; max-width: 80vw; background-color: #f0f0f0; color: #333; box-sizing: border-box; overflow-y: scroll; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); height: auto;">
+        <label style="margin-bottom: 10px; display: block; font-weight: bold; color: #0056b3;">Output Message:</label>
+        <div class="form-control preview-console" style="background-color: #f0f0f0; color: #333; border: 1px solid #ccc; overflow-y: auto; font-family: 'Consolas', 'Courier New', monospace; border-radius: 4px;">
+            @foreach (var message in userMessages)
+            {
+                <div>@message</div>
+            }
+        </div>
+    </div>
+}
+
+
+@if (!string.IsNullOrEmpty(imageBase64String))
+{
+    <div style="padding: 20px;">
+        <label>Image Preview:</label>
+        <img src="@imageBase64String" alt="Selected Image Preview" style="max-width: 100%; height: auto;" />
+    </div>
+}
+
+@code {
+    @* CODE IS LOCATED IN "Upload.razor.cs" *@
+   
+}
