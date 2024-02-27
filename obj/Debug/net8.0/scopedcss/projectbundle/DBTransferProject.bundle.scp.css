@@ -121,6 +121,41 @@ main[b-x1apx431el] {
     vertical-align: super;
     font-size: smaller;
 }
+.info-window[b-x1apx431el] {
+    position: fixed; /* Or absolute, depending on need */
+    top: 20%; /* Adjust based on where you want it to appear */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 100; /* Ensure it's above other content */
+    border-radius: 8px;
+    width: 300px; /* Adjust width as needed */
+}
+
+    .info-window h2[b-x1apx431el], .info-window p[b-x1apx431el] {
+        margin: 10px 0;
+    }
+
+.btn-secondary[b-x1apx431el] {
+    display: block;
+    margin: 20px auto 0; /* Center the button */
+}
+
+.btn-info[b-x1apx431el] {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+    .btn-info:hover[b-x1apx431el] {
+        background-color: #138496;
+        border-color: #117a8b;
+    }
 /* _content/DBTransferProject/Components/Layout/NavMenu.razor.rz.scp.css */
 .navbar-toggler[b-616lokey8a] {
     appearance: none;
@@ -172,7 +207,7 @@ main[b-x1apx431el] {
 }
 
 .bi-list-nested-nav-menu[b-616lokey8a] {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-list-nested' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M4.5 11.5A.5.5 0 0 1 5 11h10a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 1 3h10a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(32, 129, 186)' class='bi bi-list-nested' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M4.5 11.5A.5.5 0 0 1 5 11h10a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 1 3h10a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5z'/%3E%3C/svg%3E");
 }
 
 .nav-item[b-616lokey8a] {

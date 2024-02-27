@@ -5,6 +5,7 @@ using System.Text;
 using DBTransferProject.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Components;
+using System.Data;
 
 namespace DBTransferProject.Components.Pages
 {
@@ -214,9 +215,11 @@ namespace DBTransferProject.Components.Pages
               CONNECTION STRING: IF THERE IS A NEED TO CHANGE THE SERVER AND DATABASE.
               THE CONNECTION STRING TEMPLATE IS "Server=YOURSERVER; Darabase=YOURDATABASE; Integrated Security=True;"
             */
+            // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "ProdSql20Connection" for this step.
             var connectionString = Configuration?.GetConnectionString("DefaultConnection");
             // REFERENCE A STORED PROCEDURE -->
-            var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"];
+            // var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"];
+            var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"]; ;
             // Clear the list to ensure it's empty before starting the process
             punchoutAccountDataList.Clear();
             int recordsAdded = 0;
@@ -256,6 +259,8 @@ namespace DBTransferProject.Components.Pages
 
                             using (var command = new SqlCommand(sqlInsertCommand, connection))
                             {
+                                command.CommandType = CommandType.StoredProcedure; // Indicating it's a stored procedure
+
                                 // Add parameters to SQL command from punchoutData
                                 command.Parameters.AddWithValue("@customer", punchoutData.Customer);
                                 command.Parameters.AddWithValue("@identity", punchoutData.Identity);
@@ -341,6 +346,7 @@ namespace DBTransferProject.Components.Pages
         {
             userConfigDataList.Clear();
             // Assuming connectionString is derived from shared variables
+            // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "DLPSQLConnection" for this step.
             var connectionString = Configuration?.GetConnectionString("DefaultConnection");
 
             // Define the SQL command with placeholders
@@ -400,6 +406,8 @@ namespace DBTransferProject.Components.Pages
 
                             using (var command = new SqlCommand(sqlInsertCommand, connection))
                             {
+                                command.CommandType = CommandType.StoredProcedure; // Indicating it's a stored procedure
+
                                 // Populate SQL command parameters from both Excel and punchoutAccountDataList
                                 command.Parameters.AddWithValue("@Key", appPricelistOffer);
                                 command.Parameters.AddWithValue("@Name", schoolOrganization);
@@ -408,6 +416,7 @@ namespace DBTransferProject.Components.Pages
                                 command.Parameters.AddWithValue("@AccountNumber", punchoutAccountNumber);
                                 command.Parameters.AddWithValue("@KeyCode", appPricelistOffer);
                                 command.Parameters.AddWithValue("@CustomerType", customerType);
+                                // Add other parameters as required by the stored procedure
 
                                 await command.ExecuteNonQueryAsync();
                             }
@@ -480,6 +489,7 @@ namespace DBTransferProject.Components.Pages
          */
         private async Task TransferUserConfigToTest()
         {
+            // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "DWDSQLConnection" for this step.
             var targetConnectionString = Configuration?.GetConnectionString("DefaultConnection");
 
             var insertCommandText = Configuration?["SqlCommands:InsertUserConfigTest"];
@@ -494,12 +504,15 @@ namespace DBTransferProject.Components.Pages
                     {
                         using (var insertCommand = new SqlCommand(insertCommandText, targetConnection))
                         {
-                            // Set parameter values based on the current record in userConfigDataList
+                            insertCommand.CommandType = CommandType.StoredProcedure; // Indicating it's a stored procedure
+
+                            // Set parameter values based on the current record
                             insertCommand.Parameters.AddWithValue("@Key", config.Key);
                             insertCommand.Parameters.AddWithValue("@Name", config.Name);
                             insertCommand.Parameters.AddWithValue("@ProviderCredential", config.ProviderCredential);
                             insertCommand.Parameters.AddWithValue("@UserIdentity", config.UserIdentity);
-                            // Note: The rest of the parameters are set to their default values as per the command text
+                            // Add other parameters as required by the stored procedure
+                            // Note: Ensure you provide default values for parameters not set by the config object
 
                             await insertCommand.ExecuteNonQueryAsync();
                         }

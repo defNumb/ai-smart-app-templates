@@ -31,6 +31,7 @@ C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferPro
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.AssemblyInfo.cs
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.csproj.CoreCompileInputs.cache
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.sourcelink.json
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\staticwebassets\msbuild.DBTransferProject.Microsoft.AspNetCore.StaticWebAssets.props
@@ -40,6 +41,8 @@ C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\staticwebasse
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\staticwebassets.pack.json
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Layout\MainLayout.razor.rz.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
+C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
+C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Upload.razor.rz.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\bundle\DBTransferProject.styles.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\projectbundle\DBTransferProject.bundle.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.csproj.CopyComplete
@@ -48,6 +51,3 @@ C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\refint\DBTran
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.pdb
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.genruntimeconfig.cache
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\ref\DBTransferProject.dll
-C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
-C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Upload.razor.rz.scp.css
-C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.sourcelink.json

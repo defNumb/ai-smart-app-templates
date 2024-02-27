@@ -1,45 +1,46 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+# Excelligence Onboarding Portal
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+## About The Application
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+The Excelligence Onboarding Portal is a cutting-edge internal tool designed to automate and streamline the onboarding process for new clients at Excelligence Learning Corporation. This Blazor-based application facilitates a quick and efficient way to update necessary databases with new customer information, significantly reducing manual data entry and accelerating the onboarding workflow.
+
+## Features
+
+- **Automated Data Entry:** Minimize manual input by automatically populating customer data into pre-configured databases.
+- **Database Integration:** Seamlessly connects with multiple back-end databases to ensure all necessary client information is accurately and efficiently stored.
+- **User-Friendly Interface:** Provides a straightforward and intuitive interface for internal users to upload client data files.
+- **Secure:** Implements robust security measures to protect sensitive client information during the onboarding process.
+
+## Database Connections
+
+The Excelligence Onboarding Portal is designed to interface with several back-end databases, ensuring comprehensive data capture and storage. The current version supports connections to the following databases:
+
+- **Client Information Database:** Stores detailed client profiles, including contact information and service preferences.
+- **Onboarding Tasks Database:** Tracks the progress of various onboarding tasks and milestones for each new client. [SOON]
+- **Product Preferences Database:** Records client product preferences and any custom requirements they have. [SOON
+
+## How It Works
+
+1. **Data Upload:** Users start by uploading client data files through the portal. The application supports various file formats, including CSV and Excel.
+2. **Data Processing:** The uploaded data is automatically processed and validated by the application. It checks for any inconsistencies or missing information.
+3. **Database Update:** Upon successful validation, the application updates the relevant databases with the new client information. This process is automated, significantly reducing the potential for human error.
+4. **Confirmation & Reporting:** The user receives a confirmation that the databases have been updated, along with a report detailing the new entries.
+
+## Getting Started
+
+To begin using the Excelligence Onboarding Portal, internal users need to follow these steps:
+
+1. Ensure you have access to the required Databases. If not, contact the IT department to obtain these.
+3. Follow the on-screen instructions to upload client data files and initiate the onboarding process.
+
+## Feedback and Contributions
+
+We continually strive to improve the Excelligence Onboarding Portal. Your feedback and suggestions are invaluable to us. Please direct any feedback, suggestions, or feature requests to the development team at sespinoza@excelligence.com.
+
+## Disclaimer
+
+This application is developed exclusively for Excelligence Learning Corporation and its employees. Unauthorized access or use of this tool is strictly prohibited.
 
 ---
 
-## Edit a file
-
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
-
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
-
----
-
-## Create a file
-
-Next, you’ll add a new file to this repository.
-
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
-
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
-
----
-
-## Clone a repository
-
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
-
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
-
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+&copy; 2024 Excelligence Learning Corporation. All rights reserved.

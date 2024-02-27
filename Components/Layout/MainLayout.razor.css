@@ -120,3 +120,38 @@ main {
     vertical-align: super;
     font-size: smaller;
 }
+.info-window {
+    position: fixed; /* Or absolute, depending on need */
+    top: 20%; /* Adjust based on where you want it to appear */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 100; /* Ensure it's above other content */
+    border-radius: 8px;
+    width: 300px; /* Adjust width as needed */
+}
+
+    .info-window h2, .info-window p {
+        margin: 10px 0;
+    }
+
+.btn-secondary {
+    display: block;
+    margin: 20px auto 0; /* Center the button */
+}
+
+.btn-info {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+    .btn-info:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+    }
