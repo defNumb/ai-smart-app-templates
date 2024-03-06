@@ -215,8 +215,9 @@ namespace DBTransferProject.Components.Pages
               CONNECTION STRING: IF THERE IS A NEED TO CHANGE THE SERVER AND DATABASE.
               THE CONNECTION STRING TEMPLATE IS "Server=YOURSERVER; Darabase=YOURDATABASE; Integrated Security=True;"
             */
+            // *************************************************************************************************
             // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "ProdSql20Connection" for this step.
-            var connectionString = Configuration?.GetConnectionString("DefaultConnection");
+            var connectionString = Configuration?.GetConnectionString("ProdSql20Connection");
             // REFERENCE A STORED PROCEDURE -->
             // var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"];
             var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"]; ;
@@ -347,7 +348,7 @@ namespace DBTransferProject.Components.Pages
             userConfigDataList.Clear();
             // Assuming connectionString is derived from shared variables
             // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "DLPSQLConnection" for this step.
-            var connectionString = Configuration?.GetConnectionString("DefaultConnection");
+            var connectionString = Configuration?.GetConnectionString("DLPSQLConnection");
 
             // Define the SQL command with placeholders
             var sqlInsertCommand = Configuration?["SqlCommands:InsertUserConfig"];
@@ -490,7 +491,7 @@ namespace DBTransferProject.Components.Pages
         private async Task TransferUserConfigToTest()
         {
             // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "DWDSQLConnection" for this step.
-            var targetConnectionString = Configuration?.GetConnectionString("DefaultConnection");
+            var targetConnectionString = Configuration?.GetConnectionString("DWDSQLConnection");
 
             var insertCommandText = Configuration?["SqlCommands:InsertUserConfigTest"];
 

@@ -43,6 +43,7 @@ C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Com
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\Upload.razor.rz.scp.css
+C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\XML_Reader.razor.rz.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\bundle\DBTransferProject.styles.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\projectbundle\DBTransferProject.bundle.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.csproj.CopyComplete

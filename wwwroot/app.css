@@ -67,3 +67,19 @@ h1:focus {
     background-color: #f2f2f2;
 }
 
+.xml-preview {
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+.xml-element {
+    color: #228B22; /* Green for elements */
+}
+
+.xml-attribute {
+    color: #0000FF; /* Blue for attributes */
+}
+
+.xml-text {
+    color: #A52A2A; /* Brown for text nodes */
+}

@@ -61,37 +61,36 @@ namespace DBTransferProject.Components.Pages
                             switch (reader.NodeType)
                             {
                                 case XmlNodeType.Element:
-                                    previewHtml.Append(new string(' ', reader.Depth * 2)); // Indent based on element depth
-                                    previewHtml.Append($"&lt;{reader.Name}");
+                                    previewHtml.Append($"<span class='xml-element'>{new string(' ', reader.Depth * 2)}&lt;{reader.Name}");
 
                                     if (reader.HasAttributes)
                                     {
+                                        previewHtml.Append("<span class='xml-attribute'>");
                                         while (reader.MoveToNextAttribute())
                                         {
                                             previewHtml.Append($" {reader.Name}=\"{reader.Value}\"");
                                         }
+                                        previewHtml.Append("</span>");
                                         // Move the reader back to the element node.
                                         reader.MoveToElement();
                                     }
 
                                     if (reader.IsEmptyElement)
                                     {
-                                        previewHtml.AppendLine("/&gt;");
+                                        previewHtml.AppendLine("/&gt;</span>");
                                     }
                                     else
                                     {
-                                        previewHtml.AppendLine("&gt;");
+                                        previewHtml.AppendLine("&gt;</span>");
                                     }
                                     break;
 
                                 case XmlNodeType.Text:
-                                    previewHtml.Append(new string(' ', (reader.Depth + 1) * 2)); // Indent text content
-                                    previewHtml.AppendLine(reader.Value);
+                                    previewHtml.AppendLine($"<span class='xml-text'>{new string(' ', (reader.Depth + 1) * 2)}{reader.Value}</span>");
                                     break;
 
                                 case XmlNodeType.EndElement:
-                                    previewHtml.Append(new string(' ', reader.Depth * 2)); // Indent based on element depth
-                                    previewHtml.AppendLine($"&lt;/{reader.Name}&gt;");
+                                    previewHtml.AppendLine($"<span class='xml-element'>{new string(' ', reader.Depth * 2)}&lt;/{reader.Name}&gt;</span>");
                                     break;
                             }
                         }
@@ -111,6 +110,7 @@ namespace DBTransferProject.Components.Pages
 
             await InvokeAsync(StateHasChanged); // Ensure UI updates with the preview and messages
         }
+
         // TODO ADD DESCRIPTION
         public XmlTreeNode ParseXmlToTree(string filePath)
         {

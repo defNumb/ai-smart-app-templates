@@ -26,10 +26,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/sespinoza/source/repos/DBTransferProject/Components/Pages/XML_Reader.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xYTUxfUmVhZGVyLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/sespinoza/source/repos/DBTransferProject/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -53,3 +49,7 @@ build_metadata.AdditionalFiles.CssScope = b-h68rfy8ltg
 [C:/Users/sespinoza/source/repos/DBTransferProject/Components/Pages/Upload.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xVcGxvYWQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-znn1kcqc12
+
+[C:/Users/sespinoza/source/repos/DBTransferProject/Components/Pages/XML_Reader.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xYTUxfUmVhZGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-odr248x7n1
