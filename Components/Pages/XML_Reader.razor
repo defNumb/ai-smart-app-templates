@@ -33,6 +33,16 @@
         </div>
     </div>
 }
+@if (!string.IsNullOrEmpty(sqlPreview))
+{
+    <div class="mt-3" style="margin: 20px auto; padding: 15px; max-width: 80vw; background-color: #f0f0f0; color: #333; box-sizing: border-box; overflow-y: scroll; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); height: auto;">
+        <label style="margin-bottom: 10px; display: block; font-weight: bold; color: #0056b3;">Generated SQL Code:</label>
+        <div class="form-control preview-console" style="background-color: #f0f0f0; color: #333; border: 1px solid #ccc; overflow-y: auto; font-family: 'Consolas', 'Courier New', monospace; border-radius: 4px;">
+            <pre>@sqlPreview</pre>
+        </div>
+    </div>
+}
+
 @code {
    
 }

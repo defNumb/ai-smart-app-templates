@@ -33,7 +33,10 @@ namespace DBTransferProject.Components.Pages
         private List<UserConfigData> userConfigDataList = new List<UserConfigData>();
         private string? imageBase64String;
         private string? userMessage;
-        private string? filePreview;
+        private string filePreview = string.Empty;
+        private string Processor = string.Empty;
+        private string HoldCode = string.Empty;
+
         // HANDLER METHODS
         /*
            Developed by : Samuel Espinoza

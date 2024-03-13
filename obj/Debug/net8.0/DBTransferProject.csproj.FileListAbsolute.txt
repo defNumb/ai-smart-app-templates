@@ -46,9 +46,9 @@ C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Com
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\Components\Pages\XML_Reader.razor.rz.scp.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\bundle\DBTransferProject.styles.css
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\scopedcss\projectbundle\DBTransferProject.bundle.scp.css
-C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.csproj.CopyComplete
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.dll
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\refint\DBTransferProject.dll
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.pdb
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransferProject.genruntimeconfig.cache
 C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\ref\DBTransferProject.dll
+C:\Users\sespinoza\source\repos\DBTransferProject\obj\Debug\net8.0\DBTransf.401B3AC2.Up2Date

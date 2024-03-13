@@ -11,6 +11,7 @@ namespace DBTransferProject.Components.Pages
         private IBrowserFile? selectedFile;
         private List<string> userMessages = new List<string>();
         private string? filePreview;
+        private string sqlPreview = string.Empty;
 
         // TODO ADD DESCRIPTION
         private async Task HandleXML(InputFileChangeEventArgs e)
@@ -25,6 +26,10 @@ namespace DBTransferProject.Components.Pages
                         userMessages.Clear();
                         userMessages.Add("> XML file detected. Preparing preview...");
                         await GenerateXmlPreviewFromFile();
+                        var rootNode = await ParseXmlToTree(selectedFile);
+                        var generatedSql = GenerateSqlFromXmlTree(rootNode);
+                        sqlPreview = generatedSql;
+                        userMessages.Add("> SQL preview generated successfully.");
                         break;
                     default:
                         userMessages.Add("> Unsupported file type for preview.");
@@ -112,57 +117,69 @@ namespace DBTransferProject.Components.Pages
         }
 
         // TODO ADD DESCRIPTION
-        public XmlTreeNode ParseXmlToTree(string filePath)
+        public async Task<XmlTreeNode> ParseXmlToTree(IBrowserFile xmlFile)
         {
             XmlTreeNode rootNode = null;
             XmlTreeNode currentNode = null;
 
-            using (var reader = XmlReader.Create(filePath))
+            // OpenReadStream provides a Stream to access the file's content.
+            // Note: Consider specifying a maximum allowed size to prevent large files from causing memory issues.
+            using (var stream = xmlFile.OpenReadStream(maxAllowedSize: 1024 * 1024)) // Adjust the size limit as needed
             {
-                while (reader.Read())
+                var settings = new XmlReaderSettings
                 {
-                    switch (reader.NodeType)
+                    Async = true,
+                    IgnoreComments = true,
+                    IgnoreWhitespace = true // Adjust according to your needs
+                };
+
+                using (var reader = XmlReader.Create(stream, settings))
+                {
+                    while (await reader.ReadAsync())
                     {
-                        case XmlNodeType.Element:
-                            var newNode = new XmlTreeNode(reader.Name, currentNode);
-                            if (currentNode != null)
-                            {
-                                currentNode.Children.Add(newNode);
-                            }
-                            else
-                            {
-                                rootNode = newNode; // First element, set as root
-                            }
-
-                            if (reader.HasAttributes)
-                            {
-                                reader.MoveToFirstAttribute();
-                                do
+                        switch (reader.NodeType)
+                        {
+                            case XmlNodeType.Element:
+                                var newNode = new XmlTreeNode(reader.Name, currentNode);
+                                if (currentNode != null)
                                 {
-                                    newNode.Attributes.Add(reader.Name, reader.Value);
-                                } while (reader.MoveToNextAttribute());
-                                reader.MoveToElement(); // Move back to the element node
-                            }
+                                    currentNode.Children.Add(newNode);
+                                }
+                                else
+                                {
+                                    rootNode = newNode; // First element, set as root
+                                }
 
-                            if (!reader.IsEmptyElement)
-                            {
-                                currentNode = newNode; // Update current node if not an empty element
-                            }
-                            break;
+                                if (reader.HasAttributes)
+                                {
+                                    reader.MoveToFirstAttribute();
+                                    do
+                                    {
+                                        newNode.Attributes.Add(reader.Name, reader.Value);
+                                    } while (reader.MoveToNextAttribute());
+                                    reader.MoveToElement(); // Move back to the element node
+                                }
 
-                        case XmlNodeType.Text:
-                            if (currentNode != null)
-                            {
-                                currentNode.Content = reader.Value.Trim();
-                            }
-                            break;
+                                if (!reader.IsEmptyElement)
+                                {
+                                    currentNode = newNode; // Update current node if not an empty element
+                                }
+                                break;
 
-                        case XmlNodeType.EndElement:
-                            if (currentNode != null)
-                            {
-                                currentNode = currentNode.Parent; // Move back up to the parent node
-                            }
-                            break;
+                            case XmlNodeType.Text:
+                                if (currentNode != null)
+                                {
+                                    currentNode.Content = reader.Value.Trim();
+                                }
+                                break;
+
+                            case XmlNodeType.EndElement:
+                                if (currentNode != null)
+                                {
+                                    currentNode = currentNode.Parent; // Move back up to the parent node
+                                }
+                                break;
+                        }
                     }
                 }
             }
@@ -170,6 +187,103 @@ namespace DBTransferProject.Components.Pages
             return rootNode; // Return the root of the constructed tree
         }
 
+     public string GenerateSqlFromXmlTree(XmlTreeNode rootNode)
+{
+    var uniqueAttributes = new HashSet<string>();
 
+    // Collects unique attribute names from the entire XML structure
+    void CollectAttributes(XmlTreeNode node)
+    {
+        if (node == null) return;
+
+        foreach (var attribute in node.Attributes)
+        {
+            uniqueAttributes.Add(attribute.Key); // Add attribute name to HashSet
+        }
+
+        // Recursively collect attributes from child nodes
+        foreach (var child in node.Children)
+        {
+            CollectAttributes(child);
+        }
+    }
+
+    // Call CollectAttributes to populate uniqueAttributes
+    CollectAttributes(rootNode);
+
+    // Declare SQL variables for each unique attribute found
+    var variableDeclarations = new StringBuilder();
+    foreach (var attribute in uniqueAttributes)
+    {
+        variableDeclarations.AppendLine($"DECLARE @{attribute} NVARCHAR(MAX);");
+    }
+
+    var sqlBuilder = new StringBuilder($"{variableDeclarations.ToString()}DECLARE @ItemsXML XML;\nSET @ItemsXML = (\n");
+
+    // Recursive method to traverse the tree and generate SQL with placeholders for all nodes
+    void TraverseAndGenerateSql(XmlTreeNode node, string indent = "  ")
+    {
+        if (node == null) return;
+
+        // Start the SELECT statement for this node with a placeholder for attributes or content
+        sqlBuilder.Append($"{indent}SELECT");
+
+        // If the node has attributes, include them in the SQL statement
+        if (node.Attributes.Any())
+        {
+            foreach (var attribute in node.Attributes)
+            {
+                sqlBuilder.Append($" @{attribute.Key} AS '{node.Name}/@{attribute.Value}'");
+            }
+        }
+
+        // If the node has content, use it as a placeholder value
+        else if (!string.IsNullOrWhiteSpace(node.Content))
+        {
+            sqlBuilder.Append($" '{node.Content}' AS [{node.Name}]");
+        }
+
+        // If there are no attributes or content, insert a dummy placeholder to avoid empty SELECT statements
+        else
+        {
+            sqlBuilder.Append($" NULL AS [{node.Name}]");
+        }
+
+        // Recursively process child nodes, if any
+        if (node.Children.Any())
+        {
+            sqlBuilder.Append(",");
+            foreach (var child in node.Children)
+            {
+                sqlBuilder.Append("\n");
+                sqlBuilder.AppendLine($"{indent} (");
+                TraverseAndGenerateSql(child, indent + "  ");
+                sqlBuilder.AppendLine($"{indent} ),");
+            }
+            sqlBuilder.Length -= 2; // Remove the trailing comma and line break
+            sqlBuilder.AppendLine($"{indent}FOR XML PATH('{node.Name}'), TYPE");
+        }
+
+        // Close the SELECT statement for this node with the correct FOR XML PATH statement
+        else
+        {
+            sqlBuilder.Append($" FOR XML PATH('{node.Name}'), TYPE");
+
+            // If it's not the root node, add a new line after the closing tag
+            if (node != rootNode)
+            {
+                sqlBuilder.AppendLine();
+            }
+        }
+    }
+
+    // Start the recursive traversal from the root node
+    TraverseAndGenerateSql(rootNode, "  ");
+
+    // Close the main SQL block with FOR XML PATH to wrap everything in the specified root element
+    sqlBuilder.Append("\n) FOR XML PATH('Root'), TYPE -- Adjust 'Root' as necessary to match your XML structure's root element name");
+
+    return sqlBuilder.ToString();
+}
     }
 }
