@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <History>True|2024-03-18T16:17:14.3180178Z;True|2024-03-18T11:05:41.1315453-05:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DLPSQLConnection">
+      <Value>Server=DLPSQL%3bDatabase=WebXML%3bIntegrated Security=True%3b</Value>
+    </DestinationConnectionStrings>
+    <DestinationConnectionStrings Include="DWDSQLConnection">
+      <Value>Server=DWDSQL%3bDatabase=WebXML_v2_Test%3bIntegrated Security=True%3b</Value>
+    </DestinationConnectionStrings>
+    <DestinationConnectionStrings Include="ProdSql20Connection">
+      <Value>Server=prodsql20%3bDatabase=www_dss_customer%3bIntegrated Security=True%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>

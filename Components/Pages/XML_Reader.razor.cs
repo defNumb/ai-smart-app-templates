@@ -187,103 +187,109 @@ namespace DBTransferProject.Components.Pages
             return rootNode; // Return the root of the constructed tree
         }
 
-     public string GenerateSqlFromXmlTree(XmlTreeNode rootNode)
-{
-    var uniqueAttributes = new HashSet<string>();
-
-    // Collects unique attribute names from the entire XML structure
-    void CollectAttributes(XmlTreeNode node)
-    {
-        if (node == null) return;
-
-        foreach (var attribute in node.Attributes)
+        // GENERATING SQL CODE BY READIONG THE BINARY TREE WITH THE STORED STRUCTURE OF THE GIVEN XML TEMPLATE.
+        public string GenerateSqlFromXmlTree(XmlTreeNode rootNode)
         {
-            uniqueAttributes.Add(attribute.Key); // Add attribute name to HashSet
-        }
+            var uniqueAttributes = new HashSet<string>();
 
-        // Recursively collect attributes from child nodes
-        foreach (var child in node.Children)
-        {
-            CollectAttributes(child);
-        }
-    }
-
-    // Call CollectAttributes to populate uniqueAttributes
-    CollectAttributes(rootNode);
-
-    // Declare SQL variables for each unique attribute found
-    var variableDeclarations = new StringBuilder();
-    foreach (var attribute in uniqueAttributes)
-    {
-        variableDeclarations.AppendLine($"DECLARE @{attribute} NVARCHAR(MAX);");
-    }
-
-    var sqlBuilder = new StringBuilder($"{variableDeclarations.ToString()}DECLARE @ItemsXML XML;\nSET @ItemsXML = (\n");
-
-    // Recursive method to traverse the tree and generate SQL with placeholders for all nodes
-    void TraverseAndGenerateSql(XmlTreeNode node, string indent = "  ")
-    {
-        if (node == null) return;
-
-        // Start the SELECT statement for this node with a placeholder for attributes or content
-        sqlBuilder.Append($"{indent}SELECT");
-
-        // If the node has attributes, include them in the SQL statement
-        if (node.Attributes.Any())
-        {
-            foreach (var attribute in node.Attributes)
+            // Collects unique attribute names from the entire XML structure
+            void CollectAttributes(XmlTreeNode node)
             {
-                sqlBuilder.Append($" @{attribute.Key} AS '{node.Name}/@{attribute.Value}'");
+                if (node == null) return;
+
+                foreach (var attribute in node.Attributes)
+                {
+                    uniqueAttributes.Add(attribute.Key); // Add attribute name to HashSet
+                }
+
+                // Recursively collect attributes from child nodes
+                foreach (var child in node.Children)
+                {
+                    CollectAttributes(child);
+                }
             }
-        }
 
-        // If the node has content, use it as a placeholder value
-        else if (!string.IsNullOrWhiteSpace(node.Content))
-        {
-            sqlBuilder.Append($" '{node.Content}' AS [{node.Name}]");
-        }
+            // Call CollectAttributes to populate uniqueAttributes
+            CollectAttributes(rootNode);
 
-        // If there are no attributes or content, insert a dummy placeholder to avoid empty SELECT statements
-        else
-        {
-            sqlBuilder.Append($" NULL AS [{node.Name}]");
-        }
-
-        // Recursively process child nodes, if any
-        if (node.Children.Any())
-        {
-            sqlBuilder.Append(",");
-            foreach (var child in node.Children)
+            // Declare SQL variables for each unique attribute found
+            var variableDeclarations = new StringBuilder();
+            foreach (var attribute in uniqueAttributes)
             {
-                sqlBuilder.Append("\n");
-                sqlBuilder.AppendLine($"{indent} (");
-                TraverseAndGenerateSql(child, indent + "  ");
-                sqlBuilder.AppendLine($"{indent} ),");
+                var sanitizedAttributeName = new string(attribute.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
+                variableDeclarations.AppendLine($"DECLARE @{sanitizedAttributeName}Value NVARCHAR(MAX) = 'value for {attribute}';");
             }
-            sqlBuilder.Length -= 2; // Remove the trailing comma and line break
-            sqlBuilder.AppendLine($"{indent}FOR XML PATH('{node.Name}'), TYPE");
-        }
 
-        // Close the SELECT statement for this node with the correct FOR XML PATH statement
-        else
-        {
-            sqlBuilder.Append($" FOR XML PATH('{node.Name}'), TYPE");
+            var sqlBuilder = new StringBuilder($"{variableDeclarations.ToString()}DECLARE @TemplateXML XML;\nSET @TemplateXML = (\n");
 
-            // If it's not the root node, add a new line after the closing tag
-            if (node != rootNode)
+            // Recursive method to traverse the tree and generate SQL with placeholders for all nodes
+            void TraverseAndGenerateSql(XmlTreeNode node, string indent = " ")
             {
-                sqlBuilder.AppendLine();
+                if (node == null) return;
+
+                // Start the SELECT statement for this node with a placeholder for attributes or content
+                sqlBuilder.Append($"{indent}SELECT");
+
+                // If the node has attributes, include them in the SQL statement
+                if (node.Attributes.Any())
+                {
+                    var attributeCount = 0;
+                    foreach (var attribute in node.Attributes)
+                    {
+                        var sanitizedAttributeName = new string(attribute.Key.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
+                        sqlBuilder.Append($" @{sanitizedAttributeName}Value AS \"@{attribute.Key}\"");
+                        attributeCount++;
+
+                        if (attributeCount < node.Attributes.Count)
+                        {
+                            sqlBuilder.Append(",");
+                        }
+                    }
+                }
+
+                // If the node has content, use it as a placeholder value
+                else if (!string.IsNullOrWhiteSpace(node.Content))
+                {
+                    sqlBuilder.Append($" '{node.Content}' AS \"{node.Name}\"");
+                }
+
+                // If there are no attributes or content, insert a dummy placeholder to avoid empty SELECT statements
+                else
+                {
+                    sqlBuilder.Append($" NULL AS [{node.Name}]");
+                }
+
+                // Recursively process child nodes, if any
+                if (node.Children.Any())
+                {
+                    sqlBuilder.Append(",\n");
+                    foreach (var child in node.Children)
+                    {
+                        sqlBuilder.AppendLine($"{indent} (");
+                        TraverseAndGenerateSql(child, indent + " ");
+                        sqlBuilder.Append($"{indent} )");
+
+                        if (child != node.Children.Last())
+                        {
+                            sqlBuilder.Append(",");
+                        }
+
+                        sqlBuilder.Append("\n");
+                    }
+                    sqlBuilder.AppendLine($"{indent}FOR XML PATH('{node.Name}'), {(node == rootNode ? "ELEMENTS );" : "TYPE")}");
+                }
+
+                // Close the SELECT statement for this node with the correct FOR XML PATH statement
+                else
+                {
+                    sqlBuilder.Append($" FOR XML PATH('{node.Name}'), {(node == rootNode ? "ELEMENTS );" : "TYPE")}");
+                }
             }
+
+            // Start the recursive traversal from the root node
+            TraverseAndGenerateSql(rootNode, " ");
+
+            return sqlBuilder.ToString();
         }
-    }
-
-    // Start the recursive traversal from the root node
-    TraverseAndGenerateSql(rootNode, "  ");
-
-    // Close the main SQL block with FOR XML PATH to wrap everything in the specified root element
-    sqlBuilder.Append("\n) FOR XML PATH('Root'), TYPE -- Adjust 'Root' as necessary to match your XML structure's root element name");
-
-    return sqlBuilder.ToString();
-}
     }
 }

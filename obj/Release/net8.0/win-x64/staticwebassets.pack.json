@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Release\\net8.0\\win-x64\\scopedcss\\projectbundle\\DBTransferProject.bundle.scp.css",
+      "PackagePath": "staticwebassets\\DBTransferProject.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\images\\excelligence-logo.jpg",
+      "PackagePath": "staticwebassets\\images\\excelligence-logo.jpg"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\win-x64\\staticwebassets\\msbuild.DBTransferProject.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\win-x64\\staticwebassets\\msbuild.build.DBTransferProject.props",
+      "PackagePath": "build\\DBTransferProject.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\win-x64\\staticwebassets\\msbuild.buildMultiTargeting.DBTransferProject.props",
+      "PackagePath": "buildMultiTargeting\\DBTransferProject.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\win-x64\\staticwebassets\\msbuild.buildTransitive.DBTransferProject.props",
+      "PackagePath": "buildTransitive\\DBTransferProject.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

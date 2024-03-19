@@ -1,0 +1,418 @@
+/* _content/DBTransferProject/Components/Layout/MainLayout.razor.rz.scp.css */
+.page[b-x1apx431el] {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main[b-x1apx431el] {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.sidebar[b-x1apx431el] {
+    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+}
+
+.top-row[b-x1apx431el] {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #d6d5d5;
+    justify-content: flex-end;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+}
+
+    .top-row[b-x1apx431el]  a, .top-row[b-x1apx431el]  .btn-link {
+        white-space: nowrap;
+        margin-left: 1.5rem;
+        text-decoration: none;
+    }
+
+    .top-row[b-x1apx431el]  a:hover, .top-row[b-x1apx431el]  .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    .top-row[b-x1apx431el]  a:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+@media (max-width: 640.98px) {
+    .top-row[b-x1apx431el] {
+        justify-content: space-between;
+    }
+
+    .top-row[b-x1apx431el]  a, .top-row[b-x1apx431el]  .btn-link {
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 641px) {
+    .page[b-x1apx431el] {
+        flex-direction: row;
+    }
+
+    .sidebar[b-x1apx431el] {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .top-row[b-x1apx431el] {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .top-row.auth[b-x1apx431el]  a:first-child {
+        flex: 1;
+        text-align: right;
+        width: 0;
+    }
+
+    .top-row[b-x1apx431el], article[b-x1apx431el] {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+
+#blazor-error-ui[b-x1apx431el] {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss[b-x1apx431el] {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+.footer[b-x1apx431el] {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 1rem 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e7e7e7;
+}
+
+    .footer .container[b-x1apx431el] {
+        max-width: 960px;
+        margin: auto;
+        padding: 0 15px;
+    }
+
+    .footer .disclaimer[b-x1apx431el] {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+
+.registered-trademark[b-x1apx431el] {
+    vertical-align: super;
+    font-size: smaller;
+}
+.info-window[b-x1apx431el] {
+    position: fixed; /* Or absolute, depending on need */
+    top: 20%; /* Adjust based on where you want it to appear */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 100; /* Ensure it's above other content */
+    border-radius: 8px;
+    width: 300px; /* Adjust width as needed */
+}
+
+    .info-window h2[b-x1apx431el], .info-window p[b-x1apx431el] {
+        margin: 10px 0;
+    }
+
+.btn-secondary[b-x1apx431el] {
+    display: block;
+    margin: 20px auto 0; /* Center the button */
+}
+
+.btn-info[b-x1apx431el] {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+    .btn-info:hover[b-x1apx431el] {
+        background-color: #138496;
+        border-color: #117a8b;
+    }
+/* _content/DBTransferProject/Components/Layout/NavMenu.razor.rz.scp.css */
+.navbar-toggler[b-616lokey8a] {
+    appearance: none;
+    cursor: pointer;
+    width: 3.5rem;
+    height: 2.5rem;
+    color: white;
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.75rem rgba(255, 255, 255, 0.1);
+}
+
+.navbar-toggler:checked[b-616lokey8a] {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.top-row[b-616lokey8a] {
+    height: 3.5rem;
+    
+}
+
+.navbar-brand .navbar-logo[b-616lokey8a] {
+    height: 50px; /* Adjust as needed */
+    width: auto; /* Maintain aspect ratio */
+}
+.navbar-gradient-wrapper[b-616lokey8a] {
+    background: linear-gradient(to top, rgb(32, 129, 186), white);
+    color: #333; /* Adjust text color as needed */
+}
+.bi[b-616lokey8a] {
+    display: inline-block;
+    position: relative;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.75rem;
+    top: -1px;
+    background-size: cover;
+
+}
+
+.bi-house-door-fill-nav-menu[b-616lokey8a] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(32, 129, 186)' class='bi bi-house-door-fill' viewBox='0 0 16 16'%3E%3Cpath d='M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5Z'/%3E%3C/svg%3E");
+}
+
+.bi-plus-square-fill-nav-menu[b-616lokey8a] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(32, 129, 186)' class='bi bi-plus-square-fill' viewBox='0 0 16 16'%3E%3Cpath d='M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z'/%3E%3C/svg%3E");
+}
+
+.bi-list-nested-nav-menu[b-616lokey8a] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(32, 129, 186)' class='bi bi-list-nested' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M4.5 11.5A.5.5 0 0 1 5 11h10a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 1 3h10a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5z'/%3E%3C/svg%3E");
+}
+
+.nav-item[b-616lokey8a] {
+    font-size: 1rem;
+    padding: 0.75rem 0.5rem; /* Increased padding for more space */
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+    .nav-item:first-of-type[b-616lokey8a] {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type[b-616lokey8a] {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item[b-616lokey8a]  .nav-link {
+        color: #16468a;
+        background: none;
+        border: none;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+        width: 100%;
+    }
+
+    .nav-item[b-616lokey8a]  a.active {
+        background-color: rgba(32, 129, 186,0.37);
+        transition: background-color 0.5s ease;
+        color: #16468a;
+    }
+
+    .nav-item[b-616lokey8a]  .nav-link:hover {
+        background-color: rgba(32, 129, 186,0.37); /* Subtle hover background */
+        transition: background-color 0.5s ease;
+        color: #16468a;
+    }
+
+.nav-scrollable[b-616lokey8a] {
+    display: none;
+}
+
+.navbar-toggler:checked ~ .nav-scrollable[b-616lokey8a] {
+    display: block;
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler[b-616lokey8a] {
+        display: block;
+        position: fixed;
+        top: 0.5rem;
+        right: 1rem;
+    }
+
+    .nav-scrollable[b-616lokey8a] {
+        /* Never collapse the sidebar for wide screens */
+        display: block;
+
+        /* Allow sidebar to scroll for tall menus */
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+    .navbar-toggler:checked ~ .nav-scrollable[b-616lokey8a] {
+        display: block;
+    }
+}
+/* _content/DBTransferProject/Components/Pages/Home.razor.rz.scp.css */
+.container[b-h68rfy8ltg] {
+    max-width: 960px;
+    margin: auto;
+    padding: 2rem;
+}
+
+h1[b-h68rfy8ltg] {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3; /* A deep blue, adjust according to your theme */
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+h2[b-h68rfy8ltg] {
+    font-family: 'Roboto', sans-serif;
+    color: #02457a; /* A slightly darker shade for subheadings */
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+p[b-h68rfy8ltg] {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #333; /* Dark grey for readability */
+    margin-bottom: 1rem;
+}
+
+a[b-h68rfy8ltg] {
+    color: #007bff; /* Bootstrap's default blue for links */
+    text-decoration: none; /* Optional: removes underline from links */
+}
+
+    a:hover[b-h68rfy8ltg] {
+        text-decoration: underline; /* Restores underline on hover for clarity */
+    }
+
+strong[b-h68rfy8ltg] {
+    color: #000; /* Optional: makes bold text stand out more */
+}
+
+/* Additional styling for responsiveness and aesthetics */
+@media (max-width: 768px) {
+    .container[b-h68rfy8ltg] {
+        padding: 1rem;
+    }
+}
+/* _content/DBTransferProject/Components/Pages/Upload.razor.rz.scp.css */
+/* Styles specific to Upload component */
+h3[b-znn1kcqc12] {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3; /* Deep blue, similar to Home page header for consistency */
+    font-weight: 600; /* Slightly less weight than the main page header */
+    margin-bottom: 1rem;
+}
+
+p[b-znn1kcqc12] {
+    font-family: 'Roboto', sans-serif;
+    color: #333; /* Dark grey for easy reading */
+    line-height: 1.6; /* Increased line height for readability */
+    margin-bottom: 1rem;
+}
+
+strong[b-znn1kcqc12] {
+    font-weight: 500; /* Medium weight for emphasis, ensures legibility */
+    color: #0056b3; /* Use the same blue for strong emphasis, adjust if needed */
+}
+
+/* Optional: If you have links within your paragraph, style them for visibility */
+a[b-znn1kcqc12] {
+    color: #007bff; /* Bootstrap default blue for links, adjust if needed */
+    text-decoration: underline; /* Ensures links are recognizable */
+}
+
+    a:hover[b-znn1kcqc12] {
+        color: #0056b3; /* Darker blue on hover for interaction feedback */
+    }
+
+/* Add responsiveness to the onboarding section for better mobile viewing */
+@media (max-width: 768px) {
+    p[b-znn1kcqc12] {
+        max-width: 100%; /* Ensure the paragraph doesn't exceed the container width */
+    }
+}
+/* _content/DBTransferProject/Components/Pages/XML_Reader.razor.rz.scp.css */
+.xml-preview[b-odr248x7n1] {
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+.xml-element[b-odr248x7n1] {
+    color: #228B22; /* Green for elements */
+}
+
+.xml-attribute[b-odr248x7n1] {
+    color: #0000FF; /* Blue for attributes */
+}
+
+.xml-text[b-odr248x7n1] {
+    color: #A52A2A; /* Brown for text nodes */
+}
+/* Styles specific to Upload component */
+h3[b-odr248x7n1] {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3; /* Deep blue, similar to Home page header for consistency */
+    font-weight: 600; /* Slightly less weight than the main page header */
+    margin-bottom: 1rem;
+}
+
+p[b-odr248x7n1] {
+    font-family: 'Roboto', sans-serif;
+    color: #333; /* Dark grey for easy reading */
+    line-height: 1.6; /* Increased line height for readability */
+    margin-bottom: 1rem;
+}
+
+strong[b-odr248x7n1] {
+    font-weight: 500; /* Medium weight for emphasis, ensures legibility */
+    color: #0056b3; /* Use the same blue for strong emphasis, adjust if needed */
+}
+
+/* Optional: If you have links within your paragraph, style them for visibility */
+a[b-odr248x7n1] {
+    color: #007bff; /* Bootstrap default blue for links, adjust if needed */
+    text-decoration: underline; /* Ensures links are recognizable */
+}
+
+    a:hover[b-odr248x7n1] {
+        color: #0056b3; /* Darker blue on hover for interaction feedback */
+    }
+
+/* Add responsiveness to the onboarding section for better mobile viewing */
+@media (max-width: 768px) {
+    p[b-odr248x7n1] {
+        max-width: 100%; /* Ensure the paragraph doesn't exceed the container width */
+    }
+}

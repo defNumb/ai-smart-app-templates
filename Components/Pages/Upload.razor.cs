@@ -534,7 +534,7 @@ namespace DBTransferProject.Components.Pages
                     using (var targetConnection = new SqlConnection(targetConnectionString))
                     {
                         await targetConnection.OpenAsync();
-                        var selectCommandText = "SELECT TOP 1 * FROM [UserConfig_test] ORDER BY [Id] DESC";
+                        var selectCommandText = "SELECT TOP 1 * FROM [UserConfig] ORDER BY [Id] DESC";
                         using (var selectCommand = new SqlCommand(selectCommandText, targetConnection))
                         {
                             using (var reader = await selectCommand.ExecuteReaderAsync())
