@@ -6,6 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.AutomaticAuthentication = true;
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

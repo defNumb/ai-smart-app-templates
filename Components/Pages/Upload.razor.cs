@@ -3,11 +3,10 @@ using OfficeOpenXml;
 using System.Data.SqlClient;
 using System.Text;
 using DBTransferProject.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Components;
 using System.Data;
-
 namespace DBTransferProject.Components.Pages
+
 {
     /*
   *********** DATA UPLOAD COMPONENT LOGIC*****************
@@ -23,6 +22,7 @@ namespace DBTransferProject.Components.Pages
     {
         [Inject]
         public IConfiguration? Configuration { get; set; }
+    
         // VARIABLES
         private IBrowserFile? selectedFile;
         private string? databaseName;
@@ -34,8 +34,15 @@ namespace DBTransferProject.Components.Pages
         private string? imageBase64String;
         private string? userMessage;
         private string filePreview = string.Empty;
-        private string Processor = string.Empty;
-        private string HoldCode = string.Empty;
+        private string? Processor = string.Empty;
+        private string? HoldCode = string.Empty;
+        private const string UppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private const string LowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+        private const string Digits = "0123456789";
+        private const string SpecialCharacters = "!@#$%^&*";
+        private const string AllCharacters = UppercaseLetters + LowercaseLetters + Digits + SpecialCharacters;
+        private readonly Random _random = new Random();
+ 
 
         // HANDLER METHODS
         /*
@@ -131,18 +138,21 @@ namespace DBTransferProject.Components.Pages
          */
         private async Task UploadFile()
         {
-            if (selectedFile == null)
+            if (selectedFile == null )
             {
                 userMessages.Add("> Error: No file selected.");
                 return;
             }
-            /*
-            if (string.IsNullOrWhiteSpace(databaseName) || string.IsNullOrWhiteSpace(tableName))
+            if (Processor == string.Empty)
             {
-                userMessages.Add("> Error: Please specify both database and table names.");
+                userMessages.Add("> Error: Please Specify the Processor for the Processor field.");
                 return;
-            }*/
-            
+            }
+            if (HoldCode == string.Empty)
+            {
+                userMessages.Add("> Error: Please Specify HoldCode.");
+                return;
+            }
             var fileExtension = Path.GetExtension(selectedFile.Name).ToLowerInvariant();
             try
             {
@@ -219,11 +229,13 @@ namespace DBTransferProject.Components.Pages
               THE CONNECTION STRING TEMPLATE IS "Server=YOURSERVER; Darabase=YOURDATABASE; Integrated Security=True;"
             */
             // *************************************************************************************************
+            // TESTING CONNECTIONS STRING, COMMENT THIS OUT WHEN READY TO DEPLOY.
+            var connectionString = Configuration?.GetConnectionString("DefaultConnection");
             // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "ProdSql20Connection" for this step.
-            var connectionString = Configuration?.GetConnectionString("ProdSql20Connection");
+           // var connectionString = Configuration?.GetConnectionString("ProdSql20Connection");
             // REFERENCE A STORED PROCEDURE -->
             // var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"];
-            var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"]; ;
+            var sqlInsertCommand = Configuration?["SqlCommands:InsertPunchoutAccount"]; 
             // Clear the list to ensure it's empty before starting the process
             punchoutAccountDataList.Clear();
             int recordsAdded = 0;
@@ -350,13 +362,15 @@ namespace DBTransferProject.Components.Pages
         {
             userConfigDataList.Clear();
             // Assuming connectionString is derived from shared variables
+            // TESTING CONNECTIONS STRING, COMMENT THIS OUT WHEN READY TO DEPLOY.
+            var connectionString = Configuration?.GetConnectionString("DefaultConnection");
             // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "DLPSQLConnection" for this step.
-            var connectionString = Configuration?.GetConnectionString("DLPSQLConnection");
+            //var connectionString = Configuration?.GetConnectionString("DLPSQLConnection");
 
             // Define the SQL command with placeholders
-            var sqlInsertCommand = Configuration?["SqlCommands:InsertUserConfig"];
-
+            var sqlInsertCommand = Configuration?["SqlCommands:InsertUserConfig"];  
             int recordsAdded = 0;
+            int recordIdDLP = 0;
             try
             {
                 
@@ -420,9 +434,31 @@ namespace DBTransferProject.Components.Pages
                                 command.Parameters.AddWithValue("@AccountNumber", punchoutAccountNumber);
                                 command.Parameters.AddWithValue("@KeyCode", appPricelistOffer);
                                 command.Parameters.AddWithValue("@CustomerType", customerType);
+                                command.Parameters.AddWithValue("@HoldCode", HoldCode);
+                                command.Parameters.AddWithValue("@PurchaseOrderProcessor", Processor);
                                 // Add other parameters as required by the stored procedure
-
                                 await command.ExecuteNonQueryAsync();
+
+                            }
+                            using (var commandForId = new SqlCommand("SELECT CAST(@@IDENTITY AS INT);", connection))
+                            {
+                                // ExecuteScalar returns the first column of the first row in the result set
+                                var result = await commandForId.ExecuteScalarAsync();
+                                if (result != DBNull.Value) // Check if the result is not DBNull
+                                {
+                                    recordIdDLP = Convert.ToInt32(result);
+                                    // Update the last added UserConfigData in the list with the retrieved ID
+                                    var lastAddedUserConfig = userConfigDataList.LastOrDefault();
+                                    if (lastAddedUserConfig != null)
+                                    {
+                                        lastAddedUserConfig.IdDLP = recordIdDLP;
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle the case where no ID was retrieved, perhaps set recordIdDLP to a default value or log a warning
+                                    recordIdDLP = -1; // Example default value, or handle as appropriate
+                                }
                             }
                             recordsAdded++;
                         }
@@ -494,7 +530,9 @@ namespace DBTransferProject.Components.Pages
         private async Task TransferUserConfigToTest()
         {
             // WHEN READY TO JUMP TO PRODUCTION REPLACE CONNECTION STRING WITH "DWDSQLConnection" for this step.
-            var targetConnectionString = Configuration?.GetConnectionString("DWDSQLConnection");
+            // TESTING CONNECTIONS STRING, COMMENT THIS OUT WHEN READY TO DEPLOY.
+            var targetConnectionString = Configuration?.GetConnectionString("DefaultConnection");
+            //var targetConnectionString = Configuration?.GetConnectionString("DWDSQLConnection");
 
             var insertCommandText = Configuration?["SqlCommands:InsertUserConfigTest"];
 
@@ -515,10 +553,24 @@ namespace DBTransferProject.Components.Pages
                             insertCommand.Parameters.AddWithValue("@Name", config.Name);
                             insertCommand.Parameters.AddWithValue("@ProviderCredential", config.ProviderCredential);
                             insertCommand.Parameters.AddWithValue("@UserIdentity", config.UserIdentity);
+                            insertCommand.Parameters.AddWithValue("@HoldCode", HoldCode);
+                            insertCommand.Parameters.AddWithValue("@PurchaseOrderProcessor", Processor);
                             // Add other parameters as required by the stored procedure
                             // Note: Ensure you provide default values for parameters not set by the config object
 
                             await insertCommand.ExecuteNonQueryAsync();
+                        }
+                        using (var commandForId = new SqlCommand("SELECT CAST(@@IDENTITY AS INT);", targetConnection))
+                        {
+                            var result = await commandForId.ExecuteScalarAsync();
+                            if (result != DBNull.Value)
+                            {
+                                config.IdDWD = Convert.ToInt32(result);
+                            }
+                            else
+                            {
+                                config.IdDWD = -1; // Example default value, or handle as appropriate
+                            }
                         }
                     }
                 }
@@ -534,7 +586,7 @@ namespace DBTransferProject.Components.Pages
                     using (var targetConnection = new SqlConnection(targetConnectionString))
                     {
                         await targetConnection.OpenAsync();
-                        var selectCommandText = "SELECT TOP 1 * FROM [UserConfig] ORDER BY [Id] DESC";
+                        var selectCommandText = "SELECT TOP 1 * FROM [UserConfig_test] ORDER BY [Id] DESC";
                         using (var selectCommand = new SqlCommand(selectCommandText, targetConnection))
                         {
                             using (var reader = await selectCommand.ExecuteReaderAsync())
@@ -566,6 +618,7 @@ namespace DBTransferProject.Components.Pages
                         userMessage += $"<br>Inner exception: {ex.InnerException.Message}";
                     }
                 }
+                await CreatePunchoutUserXrefEntries();
 
             }
             catch (Exception ex)
@@ -577,9 +630,128 @@ namespace DBTransferProject.Components.Pages
                 }
             }
         }
-        
-        
-        
+        /*
+ Developed by : Samuel Espinoza
+ Method Name: CreatePunchoutUserXrefEntries
+ Parameters : none
+ Description : This is the FOURTH and last step in the back-end side of the onboarding process.
+               Using the record set in UserConfig, this method transfers the Id and Name fields
+               into the Interface database within DWDSQL and DLPSQL servers and updates the
+               PunchoutUserXref table.
+ Status: COMPLETED
+ Last date worked on: 3/21/2024
+ */
+        private async Task CreatePunchoutUserXrefEntries()
+        {
+            // testing string
+            var testConnectionString = Configuration?.GetConnectionString("DefaultConnection");
+
+            //var dlpSqlConnectionString = Configuration?.GetConnectionString("DLPSQLXrefCon");
+            //var dwdSqlConnectionString = Configuration?.GetConnectionString("DWDSQLXrefCon");
+            var sqlInsertCommanddwd = Configuration?["SqlCommands:InsertPunchoutUserXref_dwd"];
+            var sqlInsertCommanddlp = Configuration?["SqlCommands:InsertPunchoutUserXref_dlp"];
+            try
+            {
+                foreach (var config in userConfigDataList)
+                {
+                    using (var dlpSqlConnection = new SqlConnection(testConnectionString))
+                    {
+                        await dlpSqlConnection.OpenAsync();
+                        using (var insertCommand = new SqlCommand(sqlInsertCommanddlp, dlpSqlConnection))
+                        {
+                            insertCommand.CommandType = CommandType.StoredProcedure;
+                            insertCommand.Parameters.AddWithValue("@Id", config.IdDLP);
+                            insertCommand.Parameters.AddWithValue("@Name", config.Name);
+                            await insertCommand.ExecuteNonQueryAsync();
+                        }
+                    }
+
+                    using (var dwdSqlConnection = new SqlConnection(testConnectionString))
+                    {
+                        await dwdSqlConnection.OpenAsync();
+                        using (var insertCommand = new SqlCommand(sqlInsertCommanddwd, dwdSqlConnection))
+                        {
+                            insertCommand.CommandType = CommandType.StoredProcedure;
+                            insertCommand.Parameters.AddWithValue("@Id", config.IdDWD);
+                            insertCommand.Parameters.AddWithValue("@Name", config.Name);
+                            await insertCommand.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+
+                // Success Message
+                try
+                {
+                    var previewHtml4 = new StringBuilder();
+                    previewHtml4.AppendLine("<table class='table-preview'><thead>");
+                    previewHtml4.AppendLine("<tr><th colspan='2'>DLPSQL</th></tr>");
+                    previewHtml4.AppendLine("<tr><th>Id</th><th>Name</th></tr>");
+                    previewHtml4.AppendLine("</thead><tbody>");
+
+                    // Retrieve the last inserted record from DLPSQL - change this
+                    using (var dlpSqlConnection = new SqlConnection(testConnectionString))
+                    {
+                        await dlpSqlConnection.OpenAsync(); // make sure to change this otherwise it wont display correctly
+                        var selectCommandText = "SELECT TOP 1 Id, Name FROM PunchoutUserXref_dlp ORDER BY Id DESC";
+                        using (var selectCommand = new SqlCommand(selectCommandText, dlpSqlConnection))
+                        {
+                            using (var reader = await selectCommand.ExecuteReaderAsync())
+                            {
+                                if (reader.Read())
+                                {
+                                    previewHtml4.Append("<tr>");
+                                    previewHtml4.Append($"<td>{reader.GetInt32(0)}</td>");
+                                    previewHtml4.Append($"<td>{reader.GetString(1)}</td>");
+                                    previewHtml4.AppendLine("</tr>");
+                                }
+                            }
+                        }
+                    }
+
+                    previewHtml4.AppendLine("</tbody></table>");
+
+                    previewHtml4.AppendLine("<table class='table-preview'><thead>");
+                    previewHtml4.AppendLine("<tr><th colspan='2'>DWDSQL</th></tr>");
+                    previewHtml4.AppendLine("<tr><th>Id</th><th>Name</th></tr>");
+                    previewHtml4.AppendLine("</thead><tbody>");
+
+                    // Retrieve the last inserted record from DWDSQL - change this
+                    using (var dwdSqlConnection = new SqlConnection(testConnectionString))
+                    {
+                        await dwdSqlConnection.OpenAsync(); // make sure to change this otherwise it wont display correctly
+                        var selectCommandText = "SELECT TOP 1 Id, Name FROM PunchoutUserXref_dwd ORDER BY Id DESC";
+                        using (var selectCommand = new SqlCommand(selectCommandText, dwdSqlConnection))
+                        {
+                            using (var reader = await selectCommand.ExecuteReaderAsync())
+                            {
+                                if (reader.Read())
+                                {
+                                    previewHtml4.Append("<tr>");
+                                    previewHtml4.Append($"<td>{reader.GetInt32(0)}</td>");
+                                    previewHtml4.Append($"<td>{reader.GetString(1)}</td>");
+                                    previewHtml4.AppendLine("</tr>");
+                                }
+                            }
+                        }
+                    }
+
+                    previewHtml4.AppendLine("</tbody></table>");
+
+                    var successMessage = "> PunchoutUserXref tables updated successfully.";
+                    userMessage += $"<br>{successMessage}<br>{previewHtml4.ToString()}";
+                }
+                catch (Exception ex)
+                {
+                    userMessage += $"<br>Error retrieving data from PunchoutUserXref: {ex.Message}";
+                }
+            }
+            catch (Exception ex)
+            {
+                userMessages.Add($"> Error updating PunchoutUserXref tables: {ex.Message}");
+            }
+        }
+
+
         // UTILITIES
         private async Task GenerateCsvPreview()
         {
@@ -694,10 +866,6 @@ namespace DBTransferProject.Components.Pages
             }
         }
         private async Task TestDatabaseConnection() {
-            // Adjust the connection string template as necessary for your environment
-            // use web.config after testing is done.
-
-            // TODO:
             var connectionString = $"Server={serverName};Database={databaseName};Integrated Security=True;";
             try
             {
@@ -759,8 +927,43 @@ namespace DBTransferProject.Components.Pages
         // make sure it generates passwords according to Hybris standards
         private string GenerateSharedSecret()
         {
-            // Example: generate a GUID as a shared secret
-            return Guid.NewGuid().ToString("N");
+            int length = _random.Next(8, 101); // Generate length between 8 and 100
+
+            StringBuilder secretBuilder = new StringBuilder();
+            secretBuilder.Append(GetRandomCharacter(UppercaseLetters));
+            secretBuilder.Append(GetRandomCharacter(LowercaseLetters));
+            secretBuilder.Append(GetRandomCharacter(Digits));
+            secretBuilder.Append(GetRandomCharacter(SpecialCharacters));
+
+            for (int i = 4; i < length; i++) // Start from 4 because one of each type has already been added
+            {
+                secretBuilder.Append(GetRandomCharacter(AllCharacters));
+            }
+
+            // To further randomize the character positions
+            string secret = ShuffleString(secretBuilder.ToString());
+            return secret;
+        }
+
+        private char GetRandomCharacter(string validCharacters)
+        {
+            int index = _random.Next(validCharacters.Length);
+            return validCharacters[index];
+        }
+
+        private string ShuffleString(string input)
+        {
+            var array = input.ToCharArray();
+            int n = array.Length;
+            for (int i = 0; i < (n - 1); i++)
+            {
+                int r = i + _random.Next(n - i);
+                var t = array[r];
+                array[r] = array[i];
+                array[i] = t;
+            }
+
+            return new String(array);
         }
 
 
