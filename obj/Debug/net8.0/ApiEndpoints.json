@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "ContainingType": "DBTransferProject.Controllers.TestController",
+    "Method": "Post",
+    "RelativePath": "api/test",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DBTransferProject.Controllers.KustomerWebhookController",
+    "Method": "Post",
+    "RelativePath": "api/webhook/kustomer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

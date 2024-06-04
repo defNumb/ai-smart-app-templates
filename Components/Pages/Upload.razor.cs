@@ -5,6 +5,9 @@ using System.Text;
 using DBTransferProject.Models;
 using Microsoft.AspNetCore.Components;
 using System.Data;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System.Linq;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 namespace DBTransferProject.Components.Pages
 
 {
@@ -33,6 +36,7 @@ namespace DBTransferProject.Components.Pages
         private List<UserConfigData> userConfigDataList = new List<UserConfigData>();
         private string? imageBase64String;
         private string? userMessage;
+        private string? impexMessage;
         private string filePreview = string.Empty;
         private string? Processor = string.Empty;
         private string? HoldCode = string.Empty;
@@ -42,13 +46,18 @@ namespace DBTransferProject.Components.Pages
         private const string SpecialCharacters = "!@#$%^&*";
         private const string AllCharacters = UppercaseLetters + LowercaseLetters + Digits + SpecialCharacters;
         private readonly Random _random = new Random();
- 
+        private bool ImpexUploaded = false;
 
+        /*******************************************************************************************************
+        *  
+                                           ONBOARDING PART I - SQL
+        *
+        ******************************************************************************************************/
         // HANDLER METHODS
         /*
            Developed by : Samuel Espinoza
            Method Name: HandleFileSelected
-           Paramenters : InputFileChangeEvent
+           Parameters : InputFileChangeEvent
            Description : after file has been selected. It will process a snapshot of the document for the user to review.
            Status: COMPLETED
            Last date worked on: 2/8/2024       <--- update this accordingly
@@ -76,11 +85,11 @@ namespace DBTransferProject.Components.Pages
         /*
            Developed by : Samuel Espinoza
            Method Name: HandleImageSelected
-           Paramenters : InputFileChangeEvent
+           Parameters : InputFileChangeEvent
            Description : after file has been selected. It will process a snapshot of the document and display it on the screen
                          for the user to review and it will store it to complete onboarding procedure.
            Status: COMPLETED
-           Last date worked on: 2/9/2024       <--- update this accordingly
+           Last date worked on: 3/29/2024       <--- update this accordingly
          */
         private async Task HandleImageSelected(InputFileChangeEventArgs e)
         {
@@ -92,28 +101,36 @@ namespace DBTransferProject.Components.Pages
                     // Check if the file is an image based on its MIME type
                     if (imageFile.ContentType.StartsWith("image", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Limit file size, for example 5 MB. Adjust as needed.
-                        if (imageFile.Size <= 5242880) // 5MB in bytes
+                        // Check if the file extension is .jpg or .png
+                        var fileExtension = Path.GetExtension(imageFile.Name).ToLowerInvariant();
+                        if (fileExtension == ".jpg" || fileExtension == ".png")
                         {
-                            // Read the file into a MemoryStream.
-                            using (var memoryStream = new MemoryStream())
+                            // Limit file size, for example 5 MB. Adjust as needed.
+                            if (imageFile.Size <= 5242880) // 5MB in bytes
                             {
-                                await imageFile.OpenReadStream(maxAllowedSize: 5242880).CopyToAsync(memoryStream);
-                                var byteArray = memoryStream.ToArray(); // Convert the MemoryStream to a byte array.
+                                // Read the file into a MemoryStream.
+                                using (var memoryStream = new MemoryStream())
+                                {
+                                    await imageFile.OpenReadStream(maxAllowedSize: 5242880).CopyToAsync(memoryStream);
+                                    var byteArray = memoryStream.ToArray(); // Convert the MemoryStream to a byte array.
 
-                                // Convert the byte array to a Base64 string.
-                                var base64Image = Convert.ToBase64String(byteArray);
+                                    // Convert the byte array to a Base64 string.
+                                    var base64Image = Convert.ToBase64String(byteArray);
 
-                                // Prepare the image source that can be used in an <img> tag
-                                imageBase64String = $"data:{imageFile.ContentType};base64,{base64Image}";
+                                    // Prepare the image source that can be used in an <img> tag
+                                    imageBase64String = $"data:{imageFile.ContentType};base64,{base64Image}";
 
-                                // The imageUrl variable is now imageBase64String. You will use this to bind to the <img> tag in your Blazor component.
+                                }
+                            }
+                            else
+                            {
+                                // Handle file size exceeds limit
+                                userMessages.Add("> File size exceeds the allowed limit of 5MB.");
                             }
                         }
                         else
                         {
-                            // Handle file size exceeds limit
-                            userMessages.Add("> File size exceeds the allowed limit.");
+                            userMessages.Add("> Only .jpg and .png image formats are allowed.");
                         }
                     }
                     else
@@ -131,8 +148,8 @@ namespace DBTransferProject.Components.Pages
         /*
            Developed by : Samuel Espinoza
            Method Name: UploadFile
-           Paramenters : none
-           Description : This method verifies that a file has been selected and checks for the extension to appropiately call the corresponding method that will handle the file.
+           Parameters : none
+           Description : This method verifies that a file has been selected and checks for the extension to appropriately call the corresponding method that will handle the file.
            Status: COMPLETED
            Last date worked on: 2/8/2024       <--- update this accordingly
          */
@@ -182,7 +199,7 @@ namespace DBTransferProject.Components.Pages
         /*
            Developed by : Samuel Espinoza
            Method Name: ProcessCsvFile 
-           Paramenters : none
+           Parameters : none
            Description : This method processes CSV files to be uploaded to database
            Status:  COMPLETED
            Last date worked on: 2/9/2024       <--- update this accordingly
@@ -204,8 +221,8 @@ namespace DBTransferProject.Components.Pages
         /*
            Developed by : Samuel Espinoza
            Method Name: ProcessExcelFileToPunchoutAcct 
-           Paramenters : none
-           Description : This method is the FIRST step in the onboarding process. This method processes the EXCEL file and maps its fields to the punchout_acccount table
+           Parameters : none
+           Description : This method is the FIRST step in the onboarding process. This method processes the EXCEL file and maps its fields to the punchout_account table
                          to insert the a row with the defined columns and generated fields.
            Status: COMPLETED
            Last date worked on: 2/8/2024       <--- update this accordingly
@@ -258,38 +275,47 @@ namespace DBTransferProject.Components.Pages
                             var sharedSecret = GenerateSharedSecret();
                             // KEYCODE = PRICELIST
                             var keycode = new string(schoolOrganization.Where(char.IsLetterOrDigit).ToArray()).Substring(0, Math.Min(8, schoolOrganization.Length));
-
-                            // Populate the PunchoutAccountData object
-                            var punchoutData = new PunchoutAccountData
+                            // Check if the record already exists in the database
+                            var recordExists = await CheckRecordExistsAsync(connection, identity);
+                            if (!recordExists)
                             {
-                                Customer = schoolOrganization,
-                                Identity = identity,
-                                Duns = duns,
-                                SharedSecret = sharedSecret,
-                                Keycode = keycode,
-                                // TaxExempt, DeploymentMode, and DeploymentModeOverride are set to their default values
-                            };
+                                // Populate the PunchoutAccountData object
+                                var punchoutData = new PunchoutAccountData
+                                {
+                                    Customer = schoolOrganization,
+                                    Identity = identity,
+                                    Duns = duns,
+                                    SharedSecret = sharedSecret,
+                                    Keycode = keycode,
+                                    // TaxExempt, DeploymentMode, and DeploymentModeOverride are set to their default values
+                                };
 
-                            // Add the data to the list
-                            punchoutAccountDataList.Add(punchoutData);
+                                // Add the data to the list
+                                punchoutAccountDataList.Add(punchoutData);
 
-                            using (var command = new SqlCommand(sqlInsertCommand, connection))
-                            {
-                                command.CommandType = CommandType.StoredProcedure; // Indicating it's a stored procedure
+                                using (var command = new SqlCommand(sqlInsertCommand, connection))
+                                {
+                                    command.CommandType = CommandType.StoredProcedure; // Indicating it's a stored procedure
 
-                                // Add parameters to SQL command from punchoutData
-                                command.Parameters.AddWithValue("@customer", punchoutData.Customer);
-                                command.Parameters.AddWithValue("@identity", punchoutData.Identity);
-                                command.Parameters.AddWithValue("@duns", punchoutData.Duns);
-                                command.Parameters.AddWithValue("@sharedsecret", punchoutData.SharedSecret);
-                                command.Parameters.AddWithValue("@keycode", punchoutData.Keycode);
-                                command.Parameters.AddWithValue("@taxexempt", punchoutData.TaxExempt);
-                                command.Parameters.AddWithValue("@deploymentmode", punchoutData.DeploymentMode);
-                                command.Parameters.AddWithValue("@deploymentmodeoverride", punchoutData.DeploymentModeOverride);
+                                    // Add parameters to SQL command from punchoutData
+                                    command.Parameters.AddWithValue("@customer", punchoutData.Customer);
+                                    command.Parameters.AddWithValue("@identity", punchoutData.Identity);
+                                    command.Parameters.AddWithValue("@duns", punchoutData.Duns);
+                                    command.Parameters.AddWithValue("@sharedsecret", punchoutData.SharedSecret);
+                                    command.Parameters.AddWithValue("@keycode", punchoutData.Keycode);
+                                    command.Parameters.AddWithValue("@taxexempt", punchoutData.TaxExempt);
+                                    command.Parameters.AddWithValue("@deploymentmode", punchoutData.DeploymentMode);
+                                    command.Parameters.AddWithValue("@deploymentmodeoverride", punchoutData.DeploymentModeOverride);
 
-                                await command.ExecuteNonQueryAsync();
+                                    await command.ExecuteNonQueryAsync();
+                                }
+                                recordsAdded++;
                             }
-                            recordsAdded++;
+                            else
+                            {
+                                userMessages.Add($"> Record with identity '{identity}' already exists. Skipping insertion.");
+                                return;
+                            }
                         }
                     }
 
@@ -351,8 +377,8 @@ namespace DBTransferProject.Components.Pages
         /*s
            Developed by : Samuel Espinoza
            Method Name: ProcessExcelFileToUserConfig
-           Paramenters : none
-           Description : This is the SECOND step in the oboarding process, Once the excel file has been read and a new record has been added into the punchout_account table
+           Parameters : none
+           Description : This is the SECOND step in the onboarding process, Once the excel file has been read and a new record has been added into the punchout_account table
                          this method, grabs some of the fields from the original excel file and the previous table (punchout_account) to fill the required fields into the 
                          UserConfig table.
            Status: COMPLETED
@@ -521,7 +547,7 @@ namespace DBTransferProject.Components.Pages
         /*
            Developed by : Samuel Espinoza
            Method Name: TransferUserConfigToTest
-           Paramenters : none
+           Parameters : none
            Description : This is the THIRD and last step in the back-end side of the onboarding process. Using the record set in UserConfig, this method transfers the record
                          into the test database and table called UserConfig.
            Status: COMPLETED
@@ -631,16 +657,16 @@ namespace DBTransferProject.Components.Pages
             }
         }
         /*
- Developed by : Samuel Espinoza
- Method Name: CreatePunchoutUserXrefEntries
- Parameters : none
- Description : This is the FOURTH and last step in the back-end side of the onboarding process.
-               Using the record set in UserConfig, this method transfers the Id and Name fields
-               into the Interface database within DWDSQL and DLPSQL servers and updates the
-               PunchoutUserXref table.
- Status: COMPLETED
- Last date worked on: 3/21/2024
- */
+            Developed by : Samuel Espinoza
+            Method Name: CreatePunchoutUserXrefEntries
+            Parameters : none
+            Description : This is the FOURTH and last step in the back-end side of the onboarding process.
+                        Using the record set in UserConfig, this method transfers the Id and Name fields
+                        into the Interface database within DWDSQL and DLPSQL servers and updates the
+                        PunchoutUserXref table.
+            Status: COMPLETED
+            Last date worked on: 3/21/2024
+         */
         private async Task CreatePunchoutUserXrefEntries()
         {
             // testing string
@@ -744,15 +770,315 @@ namespace DBTransferProject.Components.Pages
                 {
                     userMessage += $"<br>Error retrieving data from PunchoutUserXref: {ex.Message}";
                 }
+                await GenerateImpexPreview();
             }
             catch (Exception ex)
             {
                 userMessages.Add($"> Error updating PunchoutUserXref tables: {ex.Message}");
             }
         }
+        /*******************************************************************************************************
+         *  
+                                           ONBOARDING PART II - HYBRIS
+         *
+         ****************************************************************************************************
+         */
+        /*
+         Developed by : Samuel Espinoza
+            Method Name: GenerateImpexPreview()
+            Parameters : none
+            Description : This method only generates a preview of what the Impex files will look like.
+                          Note: B2B Unit will not reflect the school logo since its asked for and required in the next method UploadImpexRecords()
+            Status: COMPLETE
+            Last date worked on: 4/5/2024
+         */
 
+        private async Task GenerateImpexPreview()
+        {
+            try
+            {
+                // Step 1 - Retrieval of data to populate fields in the IMPEX structure
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Set license context for EPPlus
+                using var stream = new MemoryStream();
+                await selectedFile!.OpenReadStream().CopyToAsync(stream);
+                using var package = new ExcelPackage(stream);
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                {
+                    userMessages.Add("> Error: No worksheet found in the Excel file.");
+                    return;
+                }
+                //
+                // B2B UNIT IMPEX
+                var b2bUnits = userConfigDataList.Select(config =>
+                {
+                    var punchoutAccount = punchoutAccountDataList.FirstOrDefault(account => account.Identity == config.UserIdentity);
 
-        // UTILITIES
+                    // Assuming the single row record is in the second row (index 2) of the worksheet
+                    var excelRow = worksheet.Cells[2, 1, 2, worksheet.Dimension.End.Column];
+                    // Get the combined name from the Excel field
+                    var combinedName = excelRow[ExcelAddress.GetAddress(2, 7)].Value?.ToString() ?? string.Empty;
+
+                    // Split the combined name into first name and last name
+                    var names = combinedName.Split(' ');
+                    var firstName = names.Length > 0 ? names[0] : string.Empty;
+                    var lastName = names.Length > 1 ? string.Join(" ", names.Skip(1)) : string.Empty;
+                    return new B2BUnit
+                    {
+                        Uid = config.UserIdentity,
+                        Name = config.Name,
+                        Groups = string.Empty,
+                        UserPriceGroup = config.Key,
+                        HpMainSubheading = string.Empty, // Assuming HpMainSubheading is in column 7 (index 6)
+                        SchoolContactFirstName = firstName ?? string.Empty, // Assuming SchoolContactFirstName is in column 8 (index 7)
+                        SchoolContactLastName = lastName ?? string.Empty, // Assuming SchoolContactLastName is in column 9 (index 8)
+                        SchoolContactTitle = string.Empty, // Assuming SchoolContactTitle is in column 10 (index 9)
+                        SchoolContactPhoneNumber = excelRow[ExcelAddress.GetAddress(2, 12)].Value?.ToString() ?? string.Empty, // Assuming SchoolContactPhoneNumber is in column 11 (index 10)
+                        SchoolContactEmail = excelRow[ExcelAddress.GetAddress(2, 11)].Value?.ToString() ?? string.Empty, // Assuming SchoolContactEmail is in column 12 (index 11)
+                        HpAdditionalInfoSubheading = string.Empty, // Assuming HpAdditionalInfoSubheading is in column 13 (index 12)
+                        HpSchoolTerms = excelRow[ExcelAddress.GetAddress(2, 9)].Value?.ToString() ?? string.Empty, // Assuming HpSchoolTerms is in column 14 (index 13)
+                        SchoolLogoURL = imageBase64String,
+                        Individual = false
+                    };
+                }).ToList();
+                //
+                // B2B CUSTOMER IMPEX
+                var b2bCustomers = userConfigDataList.Select(config =>
+                {
+                    var punchoutAccount = punchoutAccountDataList.FirstOrDefault(account => account.Identity == config.UserIdentity);
+                    return new B2BCustomer
+                    {
+                        Uid = config.UserIdentity,
+                        Name = config.Name,
+                        CustomerKey = punchoutAccount?.Keycode ?? string.Empty,
+                        PhoneNumber = string.Empty,
+                        Email = string.Empty,
+                        DefaultB2BUnit = config.UserIdentity,
+                        Groups = $"{config.UserIdentity},b2bcustomergroup",
+                        Password = string.Empty
+                    };
+                }).ToList();
+                //
+                // B2B CREDENTIALS IMPEX
+                var punchoutCredentials = punchoutAccountDataList.Select(account => new PunchOutCredential
+                {
+                    Code = account.Keycode,
+                    Domain = account.Identity,
+                    Identity = account.Identity,
+                    SharedSecret = account.SharedSecret
+                }).ToList();
+                //
+                // B2B UNIT IMPEX
+                var b2bCustomerPunchoutCredentialMappings = userConfigDataList.Select(config =>
+                {
+                    var punchoutAccount = punchoutAccountDataList.FirstOrDefault(account => account.Identity == config.UserIdentity);
+                    return new B2BCustomerPunchOutCredentialMapping
+                    {
+                        B2BCustomer = config.UserIdentity,
+                        Credentials = punchoutAccount?.Keycode ?? string.Empty
+                    };
+                }).ToList();
+
+                var addresses = userConfigDataList.Select(config => new ImpexAddress
+                {
+                    Owner = config.UserIdentity,
+                    FirstName = string.Empty,
+                    LastName = string.Empty,
+                    Line1 = string.Empty,
+                    Line2 = string.Empty,
+                    PostalCode = string.Empty,
+                    Town = string.Empty,
+                    Region = string.Empty,
+                    Country = string.Empty,
+                    Phone1 = string.Empty,
+                    BillingAddress = true,
+                    ShippingAddress = true
+                }).ToList();
+                // Step 2 - Creation of IMPEX files according to the required schema
+                var b2bUnitImpex = CreateB2BUnitImpexFile(b2bUnits);
+                var b2bCustomerImpex = CreateB2BCustomerImpexFile(b2bCustomers);
+                var punchoutCredentialImpex = CreatePunchoutCredentialImpexFile(punchoutCredentials);
+                var b2bCustomerPunchoutCredentialMappingImpex = CreateB2BCustomerPunchoutCredentialMappingImpexFile(b2bCustomerPunchoutCredentialMappings);
+                var addressImpex = CreateAddressImpexFile(addresses);
+
+                // Preview IMPEX files
+                var previewHtml = new StringBuilder();
+                previewHtml.AppendLine("<b>B2B Unit IMPEX Preview:</b>");
+                previewHtml.AppendLine("<pre>" + FormatImpexFile(b2bUnitImpex) + "</pre>");
+                previewHtml.AppendLine("<b>B2B Customer IMPEX Preview:</b>");
+                previewHtml.AppendLine("<pre>" + FormatImpexFile(b2bCustomerImpex) + "</pre>");
+                previewHtml.AppendLine("<b>Punchout Credential IMPEX Preview:</b>");
+                previewHtml.AppendLine("<pre>" + FormatImpexFile(punchoutCredentialImpex) + "</pre>");
+                previewHtml.AppendLine("<b>B2B Customer Punchout Credential Mapping IMPEX Preview:</b>");
+                previewHtml.AppendLine("<pre>" + FormatImpexFile(b2bCustomerPunchoutCredentialMappingImpex) + "</pre>");
+                previewHtml.AppendLine("<b>Address IMPEX Preview:</b>");
+                previewHtml.AppendLine("<pre>" + FormatImpexFile(addressImpex) + "</pre>");
+
+                impexMessage += previewHtml.ToString();
+            }
+            catch (Exception ex)
+            {
+               userMessages.Add($"Error in GenerateImpexPreview: {ex.Message}");
+            }
+        }
+        /*
+         Developed by : Samuel Espinoza
+            Method Name: UploadImpexFiles
+            Parameters : none
+            Description : THIS IS THE FIRST STEP in the onboarding process with Hybris.
+                          This method assumes that there is a current onboarding process going on and that the first
+                          part of the onboarding has been completed and corresponding databases have been updated.
+                          Classes needed for this method have already been created within Models folder:
+                                - B2BCustomer.cs, 
+            Status: INCOMPLETE
+            Last date worked on: 4/5/2024
+            STEPS:
+                   1 - Connection to the IMPEX file bucket.
+                   2 - Handle of Image required for completion of onboarding. 
+                        - (What format, How do you handle the package? What does SAP expect the image package to be like?).
+                        - https://dmzn2b8hkpq8b.cloudfront.net/images/customers/logos/
+                   3 - Retrieval of data to populate fields in the IMPEX structure.
+                   4 - Creation of IMPEX file according to the required schema. 
+                   5 - Uploading IMPEX file to Bucket with appropriate naming conventions.
+ */
+        private async Task UploadImpexFiles()
+        {
+            try
+            {
+                // Check if the user has selected an image
+                if (string.IsNullOrEmpty(imageBase64String))
+                {
+                    userMessages.Add("> Please select an image before uploading IMPEX files.");
+                    return;
+                }
+
+                // Step 1 - Retrieval of data to populate fields in the IMPEX structure
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Set license context for EPPlus
+                using var stream = new MemoryStream();
+                await selectedFile!.OpenReadStream().CopyToAsync(stream);
+                using var package = new ExcelPackage(stream);
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                {
+                    userMessages.Add("> Error: No worksheet found in the Excel file.");
+                    return;
+                }
+                //
+                // B2B UNIT IMPEX
+                var b2bUnits = userConfigDataList.Select(config =>
+                {
+                    var punchoutAccount = punchoutAccountDataList.FirstOrDefault(account => account.Identity == config.UserIdentity);
+
+                    // Assuming the single row record is in the second row (index 2) of the worksheet
+                    var excelRow = worksheet.Cells[2, 1, 2, worksheet.Dimension.End.Column];
+                    // Get the combined name from the Excel field
+                    var combinedName = excelRow[ExcelAddress.GetAddress(2, 7)].Value?.ToString() ?? string.Empty;
+
+                    // Split the combined name into first name and last name
+                    var names = combinedName.Split(' ');
+                    var firstName = names.Length > 0 ? names[0] : string.Empty;
+                    var lastName = names.Length > 1 ? string.Join(" ", names.Skip(1)) : string.Empty;
+                    return new B2BUnit
+                    {
+                        Uid = config.UserIdentity,
+                        Name = config.Name,
+                        Groups = string.Empty,
+                        UserPriceGroup = config.Key,
+                        HpMainSubheading = string.Empty, // Assuming HpMainSubheading is in column 7 (index 6)
+                        SchoolContactFirstName = firstName ?? string.Empty, // Assuming SchoolContactFirstName is in column 8 (index 7)
+                        SchoolContactLastName = lastName ?? string.Empty, // Assuming SchoolContactLastName is in column 9 (index 8)
+                        SchoolContactTitle = string.Empty, // Assuming SchoolContactTitle is in column 10 (index 9)
+                        SchoolContactPhoneNumber = excelRow[ExcelAddress.GetAddress(2, 12)].Value?.ToString() ?? string.Empty, // Assuming SchoolContactPhoneNumber is in column 11 (index 10)
+                        SchoolContactEmail = excelRow[ExcelAddress.GetAddress(2, 11)].Value?.ToString() ?? string.Empty, // Assuming SchoolContactEmail is in column 12 (index 11)
+                        HpAdditionalInfoSubheading = string.Empty, // Assuming HpAdditionalInfoSubheading is in column 13 (index 12)
+                        HpSchoolTerms = excelRow[ExcelAddress.GetAddress(2, 9)].Value?.ToString() ?? string.Empty, // Assuming HpSchoolTerms is in column 14 (index 13)
+                        SchoolLogoURL = imageBase64String,
+                        Individual = false
+                    };
+                }).ToList();
+                //
+                // B2B CUSTOMER IMPEX
+                var b2bCustomers = userConfigDataList.Select(config =>
+                {
+                    var punchoutAccount = punchoutAccountDataList.FirstOrDefault(account => account.Identity == config.UserIdentity);
+                    return new B2BCustomer
+                    {
+                        Uid = config.UserIdentity,
+                        Name = config.Name,
+                        CustomerKey = punchoutAccount?.Keycode ?? string.Empty,
+                        PhoneNumber = string.Empty,
+                        Email = string.Empty,
+                        DefaultB2BUnit = config.UserIdentity,
+                        Groups = $"{config.UserIdentity},b2bcustomergroup",
+                        Password = string.Empty
+                    };
+                }).ToList();
+                //
+                // B2B CREDENTIALS IMPEX
+                var punchoutCredentials = punchoutAccountDataList.Select(account => new PunchOutCredential
+                {
+                    Code = account.Keycode,
+                    Domain = account.Identity,
+                    Identity = account.Identity,
+                    SharedSecret = account.SharedSecret
+                }).ToList();
+                //
+                // B2B UNIT IMPEX
+                var b2bCustomerPunchoutCredentialMappings = userConfigDataList.Select(config =>
+                {
+                    var punchoutAccount = punchoutAccountDataList.FirstOrDefault(account => account.Identity == config.UserIdentity);
+                    return new B2BCustomerPunchOutCredentialMapping
+                    {
+                        B2BCustomer = config.UserIdentity,
+                        Credentials = punchoutAccount?.Keycode ?? string.Empty
+                    };
+                }).ToList();
+
+                var addresses = userConfigDataList.Select(config => new ImpexAddress
+                {
+                    Owner = config.UserIdentity,
+                    FirstName = string.Empty,
+                    LastName = string.Empty,
+                    Line1 = string.Empty,
+                    Line2 = string.Empty,
+                    PostalCode = string.Empty,
+                    Town = string.Empty,
+                    Region = string.Empty,
+                    Country = string.Empty,
+                    Phone1 = string.Empty,
+                    BillingAddress = true,
+                    ShippingAddress = true
+                }).ToList();
+                // Step 2 - Creation of IMPEX files according to the required schema
+                var b2bUnitImpex = CreateB2BUnitImpexFile(b2bUnits);
+                var b2bCustomerImpex = CreateB2BCustomerImpexFile(b2bCustomers);
+                var punchoutCredentialImpex = CreatePunchoutCredentialImpexFile(punchoutCredentials);
+                var b2bCustomerPunchoutCredentialMappingImpex = CreateB2BCustomerPunchoutCredentialMappingImpexFile(b2bCustomerPunchoutCredentialMappings);
+                var addressImpex = CreateAddressImpexFile(addresses);
+
+                // Step 3 - Uploading IMPEX files to the bucket with appropriate naming conventions
+                // TODO: Implement the logic to upload the IMPEX files to the Hybris bucket
+                // Example: await UploadImpexFileToBucket(updatedB2bUnitImpex, "b2b_unit");
+                // Example: await UploadImpexFileToBucket(b2bCustomerImpex, "b2b_customer");
+                // Example: await UploadImpexFileToBucket(punchoutCredentialImpex, "punchout_credential");
+                // Example: await UploadImpexFileToBucket(b2bCustomerPunchoutCredentialMappingImpex, "b2bcustomer_punchout_credential");
+                // Example: await UploadImpexFileToBucket(addressImpex, "address");
+
+                userMessages.Add("> IMPEX files uploaded successfully to the Hybris bucket.");
+                ImpexUploaded = true;
+            }
+            catch (Exception ex)
+            {
+                userMessages.Add($"Error in UploadImpexFiles: {ex.Message}");
+            }
+        }
+        /*******************************************************************************************************
+         *  
+                                              UTILITY METHODS
+         *
+         ****************************************************************************************************
+         */
+
         private async Task GenerateCsvPreview()
         {
             try
@@ -805,7 +1131,6 @@ namespace DBTransferProject.Components.Pages
                 userMessage = $"Error generating CSV preview: {ex.Message}";
             }
         }
-
         private async Task GenerateExcelPreview()
         {
             try
@@ -878,10 +1203,10 @@ namespace DBTransferProject.Components.Pages
                     {
                         // Retrieve column headers from the specified table
                         var getColumnHeadersQuery = $@"
-                    SELECT COLUMN_NAME
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_NAME = @TableName
-                    ORDER BY ORDINAL_POSITION";
+                                SELECT COLUMN_NAME
+                                FROM INFORMATION_SCHEMA.COLUMNS
+                                WHERE TABLE_NAME = @TableName
+                                ORDER BY ORDINAL_POSITION";
 
                         using (var command = new SqlCommand(getColumnHeadersQuery, connection))
                         {
@@ -919,11 +1244,60 @@ namespace DBTransferProject.Components.Pages
                 userMessage = $"Connection failed: {ex.Message}";
             }
         }
+        // LOGGING METHOD -- NOT IMPLEMENTED 
+        private async Task LogAction(string action, string recordDetails, string databasesAccessed)
+        {
+            try
+            {
+                // Get the current user's name (placeholder)
+                string userName = "[UserName]";
 
+                // Define the SQL connection string for the logging database
+                var loggingConnectionString = Configuration?.GetConnectionString("LoggingConnection");
+
+                // Define the SQL command to insert a log record
+                var sqlInsertLog = "INSERT INTO LogTable (UserName, Action, RecordDetails, DatabasesAccessed, Timestamp) " +
+                                   "VALUES (@UserName, @Action, @RecordDetails, @DatabasesAccessed, @Timestamp)";
+
+                using (var connection = new SqlConnection(loggingConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (var command = new SqlCommand(sqlInsertLog, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserName", userName);
+                        command.Parameters.AddWithValue("@Action", action);
+                        command.Parameters.AddWithValue("@RecordDetails", recordDetails);
+                        command.Parameters.AddWithValue("@DatabasesAccessed", databasesAccessed);
+                        command.Parameters.AddWithValue("@Timestamp", DateTime.Now);
+
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occur during logging
+                Console.WriteLine($"Error logging action: {ex.Message}");
+            }
+        }
+        // SPACE REMOVER
         private string RemoveSpaces(string input)
         {
             return input.Replace(" ", string.Empty);
         }
+        // CHECKS IF RECORD EXISTS BEFORE ONBOARDING PART I STARTS
+        private async Task<bool> CheckRecordExistsAsync(SqlConnection connection, string identity)
+        {
+            var checkRecordExistsQuery = "SELECT COUNT(*) FROM punchout_account WHERE [identity] = @Identity";
+            using (var command = new SqlCommand(checkRecordExistsQuery, connection))
+            {
+                command.Parameters.AddWithValue("@Identity", identity);
+                var count = (int)await command.ExecuteScalarAsync();
+                return count > 0;
+            }
+        }
+        //
         // make sure it generates passwords according to Hybris standards
         private string GenerateSharedSecret()
         {
@@ -944,13 +1318,13 @@ namespace DBTransferProject.Components.Pages
             string secret = ShuffleString(secretBuilder.ToString());
             return secret;
         }
-
+        // RANDOM CHARACTER SELECTOR
         private char GetRandomCharacter(string validCharacters)
         {
             int index = _random.Next(validCharacters.Length);
             return validCharacters[index];
         }
-
+        // STRING SHUFFLER
         private string ShuffleString(string input)
         {
             var array = input.ToCharArray();
@@ -965,7 +1339,113 @@ namespace DBTransferProject.Components.Pages
 
             return new String(array);
         }
+        //
+        // Helper method TO FORMAT IMPEX files
+        private string FormatImpexFile(string impexFile)
+        {
+            var lines = impexFile.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var sb = new StringBuilder();
+            foreach (var line in lines)
+            {
+                if (line.StartsWith("INSERT_UPDATE"))
+                {
+                    sb.AppendLine(line);
+                }
+                else
+                {
+                    sb.AppendLine("    " + line);
+                }
+            }
+            return sb.ToString();
+        }
+        //
+        // Helper methods to create IMPEX files
+        private string CreateB2BUnitImpexFile(List<B2BUnit> b2bUnits)
+        {
+            var sb = new StringBuilder();
+            foreach (var unit in b2bUnits)
+            {
+                sb.AppendLine($"{unit.Uid},");
+                sb.AppendLine($"{unit.Name},");
+                sb.AppendLine($"{unit.Groups},");
+                sb.AppendLine($"{unit.UserPriceGroup},");
+                sb.AppendLine($"{unit.HpMainSubheading},");
+                sb.AppendLine($"{unit.SchoolContactFirstName},");
+                sb.AppendLine($"{unit.SchoolContactLastName},");
+                sb.AppendLine($"{unit.SchoolContactTitle},");
+                sb.AppendLine($"{unit.SchoolContactPhoneNumber},");
+                sb.AppendLine($"{unit.SchoolContactEmail},");
+                sb.AppendLine($"{unit.HpAdditionalInfoSubheading},");
+                sb.AppendLine($"{unit.HpSchoolTerms},");
+                sb.AppendLine($"{unit.SchoolLogoURL},");
+                sb.AppendLine($"{unit.Individual}");
+            }
+            return sb.ToString();
+        }
 
+        private string CreateB2BCustomerImpexFile(List<B2BCustomer> b2bCustomers)
+        {
+            var sb = new StringBuilder();
+            foreach (var customer in b2bCustomers)
+            {
+                sb.AppendLine($"    {customer.Uid};");
+                sb.AppendLine($"    {customer.Name};");
+                sb.AppendLine($"    {customer.CustomerKey};");
+                sb.AppendLine($"    {customer.PhoneNumber};");
+                sb.AppendLine($"    {customer.Email};");
+                sb.AppendLine($"    {customer.DefaultB2BUnit};");
+                sb.AppendLine($"    {customer.Groups};");
+                sb.AppendLine($"    {customer.Password};");
+            }
+            return sb.ToString();
+        }
 
+        private string CreatePunchoutCredentialImpexFile(List<PunchOutCredential> punchoutCredentials)
+        {
+            var sb = new StringBuilder();
+            foreach (var credential in punchoutCredentials)
+            {
+                sb.AppendLine($"    {credential.Code};");
+                sb.AppendLine($"    {credential.Domain};");
+                sb.AppendLine($"    {credential.Identity};");
+                sb.AppendLine($"    {credential.SharedSecret};");
+            }
+            return sb.ToString();
+        }
+
+        private string CreateB2BCustomerPunchoutCredentialMappingImpexFile(List<B2BCustomerPunchOutCredentialMapping> mappings)
+        {
+            var sb = new StringBuilder();
+            foreach (var mapping in mappings)
+            {
+                sb.AppendLine($"    {mapping.B2BCustomer};");
+                sb.AppendLine($"    {mapping.Credentials};");
+            }
+            return sb.ToString();
+        }
+
+        private string CreateAddressImpexFile(List<ImpexAddress> addresses)
+        {
+            var sb = new StringBuilder();
+            foreach (var address in addresses)
+            {
+                sb.AppendLine($"    {address.Owner};");
+                sb.AppendLine($"    {address.FirstName};");
+                sb.AppendLine($"    {address.LastName};");
+                sb.AppendLine($"    {address.Line1};");
+                sb.AppendLine($"    {address.Line2};");
+                sb.AppendLine($"    {address.PostalCode};");
+                sb.AppendLine($"    {address.Town};");
+                sb.AppendLine($"    {address.Region};");
+                sb.AppendLine($"    {address.Country};");
+                sb.AppendLine($"    {address.Phone1};");
+                sb.AppendLine($"    {address.BillingAddress};");
+                sb.AppendLine($"    {address.ShippingAddress};");
+            }
+            return sb.ToString();
+        }
+       
+
+    
     }
 }

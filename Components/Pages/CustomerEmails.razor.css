@@ -1,0 +1,92 @@
+﻿.custom-container {
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.conversation-list, .message-list {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.list-group-item {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+.list-group-item:hover {
+    background-color: #f1f1f1;
+}
+
+.top-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Styles specific to CustomerEmails component */
+h3 {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3; /* Deep blue, similar to Home page header for consistency */
+    font-weight: 600; /* Slightly less weight than the main page header */
+    margin-bottom: 1rem;
+}
+
+h5 {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+p {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+strong {
+    font-weight: 500;
+    color: #0056b3;
+}
+
+/* Optional: If you have links within your paragraph, style them for visibility */
+a {
+    color: #007bff; /* Bootstrap default blue for links, adjust if needed */
+    text-decoration: underline; /* Ensures links are recognizable */
+}
+
+    a:hover {
+        color: #0056b3; /* Darker blue on hover for interaction feedback */
+    }
+
+/.message-preview {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.message-body {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+    .custom-container {
+        padding: 5px;
+    }
+
+    .list-group-item {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    h5 {
+        font-size: 16px;
+    }
+}

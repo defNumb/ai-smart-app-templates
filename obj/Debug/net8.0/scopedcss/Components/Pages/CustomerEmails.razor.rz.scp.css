@@ -1,0 +1,92 @@
+.custom-container[b-afa1wqqn1k] {
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.conversation-list[b-afa1wqqn1k], .message-list[b-afa1wqqn1k] {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.list-group-item[b-afa1wqqn1k] {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+.list-group-item:hover[b-afa1wqqn1k] {
+    background-color: #f1f1f1;
+}
+
+.top-controls[b-afa1wqqn1k] {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Styles specific to CustomerEmails component */
+h3[b-afa1wqqn1k] {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3; /* Deep blue, similar to Home page header for consistency */
+    font-weight: 600; /* Slightly less weight than the main page header */
+    margin-bottom: 1rem;
+}
+
+h5[b-afa1wqqn1k] {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+p[b-afa1wqqn1k] {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+strong[b-afa1wqqn1k] {
+    font-weight: 500;
+    color: #0056b3;
+}
+
+/* Optional: If you have links within your paragraph, style them for visibility */
+a[b-afa1wqqn1k] {
+    color: #007bff; /* Bootstrap default blue for links, adjust if needed */
+    text-decoration: underline; /* Ensures links are recognizable */
+}
+
+    a:hover[b-afa1wqqn1k] {
+        color: #0056b3; /* Darker blue on hover for interaction feedback */
+    }
+
+/.message-preview[b-afa1wqqn1k] {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.message-body[b-afa1wqqn1k] {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+    .custom-container[b-afa1wqqn1k] {
+        padding: 5px;
+    }
+
+    .list-group-item[b-afa1wqqn1k] {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    h5[b-afa1wqqn1k] {
+        font-size: 16px;
+    }
+}

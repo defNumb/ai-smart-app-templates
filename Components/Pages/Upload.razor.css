@@ -5,7 +5,12 @@ h3 {
     font-weight: 600; /* Slightly less weight than the main page header */
     margin-bottom: 1rem;
 }
-
+h5 {
+    font-family: 'Roboto', sans-serif;
+    color: #0056b3; /* Deep blue, similar to Home page header for consistency */
+    font-weight: 600; /* Slightly less weight than the main page header */
+    margin-bottom: 1rem;
+}
 p {
     font-family: 'Roboto', sans-serif;
     color: #333; /* Dark grey for easy reading */

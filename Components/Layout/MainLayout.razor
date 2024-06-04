@@ -6,16 +6,48 @@
     </div>
 
     <main>
-
-
         <article class="content px-4">
             @Body
         </article>
+        @if (isChatVisible)
+        {
+            <div id="chat-window">
+                <div id="messages">
+                    @foreach (var message in messages)
+                    {
+                        <div class="message-container @(message.IsIncoming ? "incoming" : "outgoing")">
+                            <img src="@(message.IsIncoming ? "/images/ai-assistant.png" : "/images/user.png")" alt="Profile" class="chat-icon">
+                            <div class="chat-bubble">
+                                <span>@message.Text</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div id="input-area">
+                    <input id="chat-input" type="text" @bind-value="userMessage" @onkeydown="HandleKeyDown" placeholder="Type your message..." maxlength="200" />
+                    <button id="send-button" @onclick="SendUserMessage">Send</button>
+                </div>
+                <div id="character-count">
+                    @CharacterCountMessage
+                </div>
+            </div>
+        }
+        <!-- CHAT BUTTON -->
+        <button id="chat-button"
+                @onclick="ToggleChat"
+                @onmousedown="OnMouseDown"
+                @onmouseup="OnMouseUp"
+                @onmouseleave="OnMouseUp"
+                style="@ButtonStyle">
+            <i class="fas fa-comment-dots"></i>
+            Chat with Us
+        </button>
+
         <!-- Footer -->
-        <footer class="footer mt-auto py-3 bg-ligh">
+        <footer class="footer mt-auto py-3 bg-light">
             <div class="container">
                 <p class="disclaimer">Disclaimer: Important Notice: This application is developed exclusively for <strong>Excelligence</strong> and its employees. Unauthorized access or use of this tool is strictly prohibited.</p>
-                <p>&copy; @DateTime.Now.Year Excelligence Learning Corporation. All rights reserved. <span class="registered-trademark">®</span></p><p>Version: 1.0.0</p>
+                <p>&copy; @DateTime.Now.Year Excelligence Learning Corporation. All rights reserved. <span class="registered-trademark">®</span></p><p>Version: 1.5.0</p>
             </div>
         </footer>
     </main>

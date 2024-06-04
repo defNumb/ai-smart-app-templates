@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "tl7ahEgjec3DYF+M7ecjMWaOQ0KZwASSnT8pLORAoNM=",
+  "Hash": "s1R7oTt5WZXJrYTRIYFrc4ii3+R8CdycETvDm1YsFlA=",
   "Source": "DBTransferProject",
   "BasePath": "_content/DBTransferProject",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "DBTransferProject\\wwwroot",
       "Source": "DBTransferProject",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\",
       "BasePath": "_content/DBTransferProject",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\DBTransferProject.styles.css",
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\DBTransferProject.styles.css",
       "SourceId": "DBTransferProject",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
       "BasePath": "_content/DBTransferProject",
       "RelativePath": "DBTransferProject.styles.css",
       "AssetKind": "All",
@@ -33,13 +33,13 @@
       "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\DBTransferProject.styles.css"
+      "OriginalItemSpec": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\DBTransferProject.styles.css"
     },
     {
-      "Identity": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\DBTransferProject.bundle.scp.css",
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\DBTransferProject.bundle.scp.css",
       "SourceId": "DBTransferProject",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
       "BasePath": "_content/DBTransferProject",
       "RelativePath": "DBTransferProject.bundle.scp.css",
       "AssetKind": "All",
@@ -52,13 +52,13 @@
       "AssetTraitValue": "ProjectBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\DBTransferProject.bundle.scp.css"
+      "OriginalItemSpec": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\DBTransferProject.bundle.scp.css"
     },
     {
-      "Identity": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\app.css",
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\app.css",
       "SourceId": "DBTransferProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\",
       "BasePath": "_content/DBTransferProject",
       "RelativePath": "app.css",
       "AssetKind": "All",
@@ -74,10 +74,10 @@
       "OriginalItemSpec": "wwwroot\\app.css"
     },
     {
-      "Identity": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css",
       "SourceId": "DBTransferProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\",
       "BasePath": "_content/DBTransferProject",
       "RelativePath": "bootstrap/bootstrap.min.css",
       "AssetKind": "All",
@@ -93,10 +93,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Identity": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "SourceId": "DBTransferProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\",
       "BasePath": "_content/DBTransferProject",
       "RelativePath": "bootstrap/bootstrap.min.css.map",
       "AssetKind": "All",
@@ -112,10 +112,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Identity": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\favicon.png",
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\favicon.png",
       "SourceId": "DBTransferProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\",
       "BasePath": "_content/DBTransferProject",
       "RelativePath": "favicon.png",
       "AssetKind": "All",
@@ -131,10 +131,10 @@
       "OriginalItemSpec": "wwwroot\\favicon.png"
     },
     {
-      "Identity": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\images\\excelligence-logo.jpg",
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\images\\excelligence-logo.jpg",
       "SourceId": "DBTransferProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\",
       "BasePath": "_content/DBTransferProject",
       "RelativePath": "images/excelligence-logo.jpg",
       "AssetKind": "All",
@@ -148,6 +148,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\excelligence-logo.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\images\\user.png",
+      "SourceId": "DBTransferProject",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\",
+      "BasePath": "_content/DBTransferProject",
+      "RelativePath": "images/user.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\user.png"
     }
   ]
 }

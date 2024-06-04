@@ -1,28 +1,32 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\DBTransferProject.bundle.scp.css",
+      "Id": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\DBTransferProject.bundle.scp.css",
       "PackagePath": "staticwebassets\\DBTransferProject.bundle.scp.css"
     },
     {
-      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\app.css",
+      "Id": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\app.css",
       "PackagePath": "staticwebassets\\app.css"
     },
     {
-      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Id": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Id": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\favicon.png",
+      "Id": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\favicon.png",
       "PackagePath": "staticwebassets\\favicon.png"
     },
     {
-      "Id": "C:\\Users\\sespinoza\\source\\repos\\DBTransferProject\\wwwroot\\images\\excelligence-logo.jpg",
+      "Id": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\images\\excelligence-logo.jpg",
       "PackagePath": "staticwebassets\\images\\excelligence-logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\sespinoza\\OneDrive - Excelligence\\source\\repos\\DBTransferProject\\wwwroot\\images\\user.png",
+      "PackagePath": "staticwebassets\\images\\user.png"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.DBTransferProject.Microsoft.AspNetCore.StaticWebAssets.props",

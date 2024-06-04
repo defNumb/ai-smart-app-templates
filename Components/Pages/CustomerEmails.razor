@@ -1,0 +1,244 @@
+﻿@page "/customeremails"
+@using DBTransferProject.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+
+<h3>Customer Emails</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+@if (!string.IsNullOrEmpty(eventMessage))
+{
+    <div class="alert alert-info" role="alert">
+        @eventMessage
+    </div>
+}
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="top-controls custom-container">
+                <select class="form-select d-inline-block w-auto" @onchange="FilterConversations">
+                    <option value="all">All</option>
+                    <option value="open">Open</option>
+                    <option value="done">Done</option>
+                </select>
+            </div>
+
+            <button @onclick="ToggleEmailSource" class="btn btn-primary">@emailSourceButtonText</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-12 mb-3">
+            <h5>Conversations</h5>
+            <div class="conversation-list custom-container">
+                @if (conversations == null || !conversations.Any())
+                {
+                    <p>New conversations will appear here as they arrive</p>
+                }
+                else
+                {
+                    <ul class="list-group">
+                        @foreach (var conversation in conversations)
+                        {
+                            if (conversation?.Id != null)
+                            {
+                                <li class="list-group-item" @onclick="() => SelectConversation(conversation.Id)">
+                                    <div>
+                                        <strong>@conversation.Attributes.Name</strong>
+                                    </div>
+                                    <div class="message-preview">
+                                        <small>@Truncate(conversation.Attributes.Preview, 50)</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-secondary">@conversation.Attributes.Status</span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="col-md-8 col-12">
+            <h5>Messages</h5>
+            <div class="message-list custom-container">
+                @if (selectedMessages == null || !selectedMessages.Any())
+                {
+                    <p>Select a conversation to view messages</p>
+                }
+                else
+                {
+                    <ul class="list-group">
+                        @foreach (var message in selectedMessages)
+                        {
+                            if (message?.Id != null)
+                            {
+                                <li class="list-group-item">
+                                    <div>
+                                        <strong>@message.Attributes.SentAt</strong>
+                                        <strong>@message.Attributes.Meta.From</strong>
+                                    </div>
+                                    <div class="message-body">
+                                        @message.Attributes.Preview
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-6">
+                <h5>AI Analysis</h5>
+                <div class="ai-analysis custom-container">
+                    @if (isAnalyzing)
+                    {
+                        <p>Analyzing email... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></p>
+                    }
+                    else if (aiResponse == null)
+                    {
+                        <p>Select a conversation to view AI analysis</p>
+                    }
+                    else if (!string.IsNullOrEmpty(aiResponse.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            <strong>Error:</strong> @aiResponse.ErrorMessage
+                        </div>
+                        <div>
+                            <strong>Raw AI Response:</strong> @aiResponse.RawResponse
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <strong>Category:</strong> @aiResponse.Category
+                        </div>
+                        <div>
+                            <strong>Sentiment:</strong> @aiResponse.Sentiment
+                        </div>
+                        <div>
+                            <strong>Keywords:</strong>
+                            <ul>
+                                <li><strong>Account Number:</strong> @aiResponse.Keywords.AccountNumber</li>
+                                <li><strong>PO Number:</strong> @aiResponse.Keywords.PoNumber</li>
+                                <li>
+                                    <strong>Item Numbers:</strong>
+                                    @if (aiResponse.Keywords.ItemNumber != null && aiResponse.Keywords.ItemNumber.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var item in aiResponse.Keywords.ItemNumber)
+                                            {
+                                                <li>@item</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </li>
+                                <li><strong>Order Confirmation:</strong> @aiResponse.Keywords.OrderConfirmation</li>
+                                <li>
+                                    <strong>Order Numbers:</strong>
+                                    @if (aiResponse.Keywords.OrderNumber != null && aiResponse.Keywords.OrderNumber.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var order in aiResponse.Keywords.OrderNumber)
+                                            {
+                                                <li>@order</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </li>
+                                <li><strong>Tracking Number:</strong> @aiResponse.Keywords.TrackingNumber</li>
+                                <li><strong>Carrier:</strong> @aiResponse.Keywords.Carrier</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Important Information:</strong>
+                            <ul>
+                                <li><strong>Customer Name:</strong> @aiResponse.ImportantInformation.CustomerName</li>
+                                <li><strong>Customer Phone:</strong> @aiResponse.ImportantInformation.CustomerPhone</li>
+                                <li><strong>Customer Email:</strong> @aiResponse.ImportantInformation.CustomerEmail</li>
+                                <li><strong>Customer Address:</strong> @aiResponse.ImportantInformation.CustomerAddress</li>
+                                <li><strong>Organization:</strong> @aiResponse.ImportantInformation.Organization</li>
+                            </ul>
+                            <div>
+                                <p><strong>Total Cost:</strong>@aiResponse.Cost</p>
+                            </div>
+                        </div>
+                        <div>
+                            <strong>Recommended Action:</strong>
+                            @if (aiResponse.Action == "EmailResponse")
+                            {
+                                <div>
+                                    <p>Generated Email:</p>
+                                    <pre style="white-space: pre-wrap;">@aiResponse.EmailPrompt</pre>
+                                    <button @onclick="ApproveAndSendEmail">Approve Email and Send</button>
+                                </div>
+                            }
+                            else if (aiResponse.Action == "DelegateToHuman")
+                            {
+                                <div>
+                                    <p>Please delegate this conversation to a human customer representative.</p>
+                                    <button @onclick="DelegateToCustomerRep">Let customer rep take charge of this issue</button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-6">
+                <h5>Tracking Results</h5>
+                <div class="tracking-results custom-container">
+                    @if (aiResponse?.TrackingResults != null && aiResponse.TrackingResults.Any())
+                    {
+                        @foreach (var trackingInfo in aiResponse.TrackingResults)
+                        {
+                            <div class="tracking-item">
+                                <strong>Tracking Number: @trackingInfo.TrackingNumber</strong>
+                                <p>Carrier: @trackingInfo.Carrier</p>
+                                <div class="status-details">
+                                    <p>Status: @trackingInfo.TrackingResult.StatusByLocale</p>
+                                    <p>Description: @trackingInfo.TrackingResult.Description</p>
+                                    <p>Scan Location: @trackingInfo.TrackingResult.ScanLocationCity, @trackingInfo.TrackingResult.ScanLocationState, @trackingInfo.TrackingResult.ScanLocationCountry</p>
+                                    <p>Reason: @trackingInfo.TrackingResult.ReasonDescription</p>
+                                </div>
+                                @if (!string.IsNullOrEmpty(trackingInfo.TrackingResult.EstimatedDeliveryBegins) || !string.IsNullOrEmpty(trackingInfo.TrackingResult.EstimatedDeliveryEnds))
+                                {
+                                    <div class="delivery-time-window">
+                                        <p>Estimated Delivery Time Window:</p>
+                                        <p>Starts: @trackingInfo.TrackingResult.EstimatedDeliveryBegins</p>
+                                        <p>Ends: @trackingInfo.TrackingResult.EstimatedDeliveryEnds</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No tracking information available.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private string Truncate(string value, int maxLength)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        return value.Length <= maxLength ? value : value.Substring(0, maxLength) + "...";
+    }
+}
