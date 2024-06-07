@@ -49,7 +49,7 @@ namespace DBTransferProject.Models
                     Attributes = new ApiConversationAttributes
                     {
                         Name = "Shipping Issue - Please Help!",
-                        Preview = "Hello, I've been tracking my package with the tracking number FEDEX 122816215025810, and it seems to be stuck in transit. It was supposed to be delivered two days ago. I'm getting really worried. Can you please investigate and let me know what's causing the delay? I would greatly appreciate your help.",
+                        Preview = "Hello, I've been tracking my package with the tracking number 122816215025810, and it seems to be stuck in transit. It was supposed to be delivered two days ago. I'm getting really worried. Can you please investigate and let me know what's causing the delay? I would greatly appreciate your help.",
                         Status = "open"
                     },
                     Messages = new List<ApiMessage>
@@ -61,7 +61,7 @@ namespace DBTransferProject.Models
                             {
                                 SentAt = DateTime.Now.AddMinutes(-60),
                                 Subject = "Shipping Issue - Please Help!",
-                                Preview = "Hello, I've been tracking my package with the tracking number FEDEX 122816215025810, and it seems to be stuck in transit. It was supposed to be delivered two days ago. I'm getting really worried. Can you please investigate and let me know what's causing the delay? I would greatly appreciate your help.",
+                                Preview = "Hello, I've been tracking my package with the tracking number 122816215025810, and it seems to be stuck in transit. It was supposed to be delivered two days ago. I'm getting really worried. Can you please investigate and let me know what's causing the delay? I would greatly appreciate your help.",
                             Meta = new ApiMessagesMeta
                                 {
                                     From = "customer_email@mail.com"

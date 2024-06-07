@@ -488,6 +488,20 @@ a[b-afa1wqqn1k] {
         font-size: 16px;
     }
 }
+
+.new-item[b-afa1wqqn1k] {
+    animation: fadeIn-b-afa1wqqn1k 1s;
+}
+
+@keyframes fadeIn-b-afa1wqqn1k {
+    from {
+        background-color: #ff0; /* Highlight color */
+    }
+
+    to {
+        background-color: #fff; /* Normal color */
+    }
+}
 /* _content/DBTransferProject/Components/Pages/Home.razor.rz.scp.css */
 .container[b-h68rfy8ltg] {
     max-width: 960px;

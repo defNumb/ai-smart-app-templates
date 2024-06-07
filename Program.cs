@@ -9,6 +9,7 @@ using Azure.AI.TextAnalytics;
 using Azure;
 using DBTransferProject.AIServices;
 using System.Net.Http;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("https://localhost:8080", "http://localhost:8081");
@@ -25,7 +26,7 @@ builder.Services.AddSingleton(sp =>
 {
     var httpClient = new HttpClient { BaseAddress = new Uri("https://api.kustomerapp.com") };
     httpClient.DefaultRequestHeaders.Add("accept", "application/json");
-    httpClient.DefaultRequestHeaders.Add("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NThiZDdiYjU0ZjI2MGY5MzYwMzEzMCIsInVzZXIiOiI2NjU4YmQ3YTBlYTNiMjAwMmFhZjE1YWUiLCJvcmciOiI1ZDAyZTNjODcxMmQ0YzAwMWE2ZjhkZjIiLCJvcmdOYW1lIjoiZGlzY291bnRzY2hvb2xzdXBwbHkiLCJ1c2VyVHlwZSI6Im1hY2hpbmUiLCJwb2QiOiJwcm9kMSIsInJvbGVzIjpbIm9yZy51c2VyLmNvbnZlcnNhdGlvbi5yZWFkIiwib3JnLnVzZXIubWVzc2FnZS5yZWFkIiwib3JnLnVzZXIua2IucmVhZCJdLCJleHAiOjE3MTc2OTY1MDYsImF1ZCI6InVybjpjb25zdW1lciIsImlzcyI6InVybjphcGkiLCJzdWIiOiI2NjU4YmQ3YTBlYTNiMjAwMmFhZjE1YWUifQ.mA1PiwlSmk3DJjnoNUggM9qEhEDQlIlYPefdMgnCcik");
+    httpClient.DefaultRequestHeaders.Add("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NjFmYTFkNmFkMjRhMmUxMmM3ZGViNiIsInVzZXIiOiI2NjYxZmExZDkwYjEzMDRiNmIyN2U3Y2MiLCJvcmciOiI1ZDAyZTNjODcxMmQ0YzAwMWE2ZjhkZjIiLCJvcmdOYW1lIjoiZGlzY291bnRzY2hvb2xzdXBwbHkiLCJ1c2VyVHlwZSI6Im1hY2hpbmUiLCJwb2QiOiJwcm9kMSIsInJvbGVzIjpbIm9yZy51c2VyLmNvbnZlcnNhdGlvbi5yZWFkIiwib3JnLnVzZXIubWVzc2FnZS5yZWFkIl0sImV4cCI6MTcxODMwMTg1MywiYXVkIjoidXJuOmNvbnN1bWVyIiwiaXNzIjoidXJuOmFwaSIsInN1YiI6IjY2NjFmYTFkOTBiMTMwNGI2YjI3ZTdjYyJ9.Ipazd85fOHfVDyCqmLee1OpWoE0V8A7KrUIel_DxeXU");
     return httpClient;
 });
 
@@ -40,11 +41,12 @@ builder.Services.AddTransient<EntityExtractionAgent>();
 builder.Services.AddTransient<ImportantInformationExtractionAgent>();
 builder.Services.AddTransient<RecommendedActionAgent>();
 builder.Services.AddTransient<CarrierTrackingAgent>();
-builder.Services.AddTransient<TrackingRequestDetectionAgent>();
+builder.Services.AddTransient<TrackingInfoAgent>();
 builder.Services.AddTransient<UrgencyDetectionAgent>();
 builder.Services.AddTransient<ValidationAgent>();
 builder.Services.AddTransient<CostTracker>();
-builder.Services.AddTransient<EntityValidator>();
+builder.Services.AddTransient<ActionSelectionAgent>();
+builder.Services.AddTransient<FilterAgent>();
 // Register Agent Orchestrator
 builder.Services.AddTransient<AgentOrchestrator>();
 

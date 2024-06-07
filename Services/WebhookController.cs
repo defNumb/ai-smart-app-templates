@@ -29,7 +29,7 @@ namespace DBTransferProject.Controllers
         [HttpPost]
         public async Task<IActionResult> Post()
         {
-            _logger.LogInformation("Webhook received");
+            //_logger.LogInformation("Webhook received");
 
             string jsonString;
             try
@@ -38,7 +38,6 @@ namespace DBTransferProject.Controllers
                 {
                     jsonString = await reader.ReadToEndAsync();
                 }
-                _logger.LogInformation("********Webhook payload received*********");
             }
             catch (Exception ex)
             {

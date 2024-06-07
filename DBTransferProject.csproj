@@ -31,4 +31,7 @@
     <None Include="wwwroot\images\ai-assistant.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AI_RAG_Excelligence\AI_RAG_Excelligence.csproj" />
+  </ItemGroup>
 </Project>

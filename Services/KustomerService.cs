@@ -109,6 +109,7 @@ namespace DBTransferProject.Services
         public string Name { get; set; }
         public string Status { get; set; }
         public string Preview { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 
     public class ApiMessage
@@ -128,5 +129,6 @@ namespace DBTransferProject.Services
     public class ApiMessagesMeta
     {
         public string From { get; set; }
+        public string Subject { get; set; }  
     }
 }

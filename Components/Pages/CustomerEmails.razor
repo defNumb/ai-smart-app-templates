@@ -21,7 +21,7 @@
     <div class="row mb-3">
         <div class="col-12">
             <div class="top-controls custom-container">
-                <select class="form-select d-inline-block w-auto" @onchange="FilterConversations">
+                <select class="form-select d-inline-block w-auto">
                     <option value="all">All</option>
                     <option value="open">Open</option>
                     <option value="done">Done</option>
@@ -42,11 +42,11 @@
                 else
                 {
                     <ul class="list-group">
-                        @foreach (var conversation in conversations)
+                        @foreach (var conversation in conversations.OrderByDescending(c => c.Attributes.CreatedAt)) // Assuming ReceivedTime is a DateTime property
                         {
                             if (conversation?.Id != null)
                             {
-                                <li class="list-group-item" @onclick="() => SelectConversation(conversation.Id)">
+                                <li class="list-group-item new-item" @onclick="() => SelectConversation(conversation.Id)">
                                     <div>
                                         <strong>@conversation.Attributes.Name</strong>
                                     </div>

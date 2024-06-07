@@ -51,7 +51,6 @@ namespace DBTransferProject.Components.Pages
                     InvokeAsync(StateHasChanged);
                 });
 
-
                 hubConnection.On<ApiConversation>("ReceiveConversation", async (conversation) =>
                 {
                     try
@@ -61,16 +60,50 @@ namespace DBTransferProject.Components.Pages
                             // Retrieve the messages of the incoming conversation using the conversation ID
                             var messages = await KustomerService.GetMessagesByConversationIdAsync(conversation.Id);
 
-                            // Call the orchestrator to get the category of the conversation
-                            var emailContent = messages.Select(m => m.Attributes.Preview).Aggregate((current, next) => current + " " + next);
-                            var categoryResult = await AgentOrchestrator.GetCategoryResultAsync(emailContent);
-                            var category = JObject.Parse(categoryResult)?["Category"]?.ToString() ?? string.Empty;
-                            Logger.LogInformation("*******Category Result: {categoryResult}**********", category);
-                            // If the returning category is "Shipping and Delivery", add the conversation to the list, otherwise skip it
-                            if (category == "Tracking Information")
+                            // Initialize the FilterAgent
+                            var filterAgent = new FilterAgent();
+
+                            // Check if the messages are from excluded addresses
+                            var validMessages = messages.Where(m => !filterAgent.IsMessageFromExcludedAddress(m)).ToList();
+
+                            // Proceed only if there are valid messages
+                            if (validMessages.Any())
                             {
-                                conversations.Add(conversation);
-                                await InvokeAsync(StateHasChanged);
+                                foreach (var message in validMessages)
+                                {
+                                    Logger.LogInformation("Before Cleanup: {emailBody}", message.Attributes.Preview);
+                                }
+
+                                // Clean the valid messages
+                                validMessages = filterAgent.FilterAndCleanMessages(validMessages);
+
+                                foreach (var message in validMessages)
+                                {
+                                    Logger.LogInformation("After Cleanup: {emailBody}", message.Attributes.Preview);
+                                }
+
+                                // Create email content including subject and body
+                                var emailContent = validMessages
+                                    .Select(m => $"{m.Attributes.Meta.Subject} {m.Attributes.Preview}")
+                                    .Aggregate((current, next) => current + " " + next);
+                                var categoryResult = await AgentOrchestrator.GetCategoryResultAsync(emailContent);
+                                var category = JObject.Parse(categoryResult)?["Category"]?.ToString() ?? string.Empty;
+                                Logger.LogInformation("*******Category Result FRONTEND: {categoryResult}**********", category);
+
+                                // If the returning category is "Tracking Information", "Order Inquiry", or "Shipping and Delivery", further analyze for tracking requests
+                                if (category == "Tracking Information" || category == "Order Inquiry" || category == "Shipping and Delivery")
+                                {
+                                    var (isTrackingRequest, confidenceLevel) = await AgentOrchestrator.CheckForTrackingRequestAsync(emailContent);
+
+                                    // Set a confidence threshold (e.g., 85%) for determining if the conversation should be added
+                                    const double confidenceThreshold = 85.0;
+
+                                    if (isTrackingRequest && confidenceLevel >= confidenceThreshold)
+                                    {
+                                        conversations.Insert(0,conversation);
+                                        await InvokeAsync(StateHasChanged);
+                                    }
+                                }
                             }
                         }
                     }
@@ -81,53 +114,6 @@ namespace DBTransferProject.Components.Pages
                     }
                 });
 
-
-                //   hubConnection.On<KustomerWebhookPayload>("ReceiveMessage", async (message) =>
-                //   {
-                //       try
-                //       {
-                //           if (message.Data.Id != null)
-                //           {
-                //               var conversationId = message.Data.Relationships.Conversation.Data.Id;
-                //               if (!conversations.Any(c => c.Id == conversationId))
-                //               {
-                //                   var conversation = await KustomerService.GetConversationByIdAsync(conversationId);
-                //                   if (conversation != null)
-                //                   {
-                //                       conversations.Add(conversation);
-                //                   }
-                //               }
-
-                //               if (conversationId == selectedConversationId)
-                //               {
-                //                   ApiMessage new_message = new ApiMessage
-                //                   {
-                //                       Id = message.Data.Id,
-                //                       Attributes = new ApiMessagesAttributes
-                //                       {
-                //                           SentAt = DateTime.Parse(message.Data.Attributes.SentAt),
-                //                           Subject = message.Data.Attributes.Subject,
-                //                           Preview = message.Data.Attributes.Preview
-                //                       }
-
-                //                   };
-
-                //                   selectedMessages.Add(new_message);
-
-                //                   // Perform AI analysis on the latest message
-                //                   await AnalyzeMessage(new_message.Attributes.Preview);
-                //               }
-
-                //               await InvokeAsync(StateHasChanged);
-                //           }
-                //       }
-                //       catch (Exception ex)
-                //       {
-                //           Logger.LogError(ex, "Error handling received message");
-                //           errorMessage = $"Error handling received message: {ex.Message}";
-                //       }
-                //   }
-                //);
 
                 await hubConnection.StartAsync();
                 Logger.LogInformation("SignalR connection started");
@@ -162,35 +148,27 @@ namespace DBTransferProject.Components.Pages
                 if (mockConversation != null)
                 {
                     selectedMessages = mockConversation.Messages;
-                    if (selectedMessages.Any())
-                    {
-                        var latestMessage = selectedMessages.OrderByDescending(m => m.Attributes.SentAt).FirstOrDefault();
-                        if (latestMessage != null)
-                        {
-                            await AnalyzeMessage(latestMessage.Attributes.Preview);
-                        }
-                    }
                 }
             }
             else
             {
                 await LoadMessages(conversationId);
             }
+
             if (selectedMessages != null && selectedMessages.Any())
             {
+                var filterAgent = new FilterAgent();
+
+                selectedMessages = filterAgent.FilterAndCleanMessages(selectedMessages);
+
                 var latestMessage = selectedMessages.OrderByDescending(m => m.Attributes.SentAt).FirstOrDefault();
                 if (latestMessage != null)
                 {
-                    await AnalyzeMessage(latestMessage.Attributes.Preview);
+                    await AnalyzeMessage(latestMessage.Attributes.Meta.Subject + latestMessage.Attributes.Preview);
                 }
             }
-           await  InvokeAsync(StateHasChanged);
-        }
 
-
-        private void FilterConversations(ChangeEventArgs e)
-        {
-            // Handle filtering logic
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task AnalyzeMessage(string messageContent)
@@ -199,7 +177,7 @@ namespace DBTransferProject.Components.Pages
             {
                 isAnalyzing = true;
                 aiResponse = null;
-                await InvokeAsync(StateHasChanged); ;
+                await InvokeAsync(StateHasChanged);
 
                 var analysisResult = await AgentOrchestrator.ProcessEmailAsync(messageContent);
                 aiResponse = JsonConvert.DeserializeObject<AIResponse>(analysisResult);
@@ -222,7 +200,6 @@ namespace DBTransferProject.Components.Pages
                 await InvokeAsync(StateHasChanged);
             }
         }
-
 
         private void ToggleEmailSource()
         {

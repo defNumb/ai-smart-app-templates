@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Text.Json;
 
 namespace DBTransferProject.AIServices
 {
@@ -15,6 +16,7 @@ namespace DBTransferProject.AIServices
     {
         // delete validation agent when done
         private readonly ValidationAgent _validationAgent;
+        private readonly TrackingInfoAgent _trackingInfoAgent;
         private readonly ILogger<AgentOrchestrator> _logger;
         private readonly CarrierTrackingAgent _carrierTrackingAgent;
         private readonly IServiceProvider _serviceProvider;
@@ -22,11 +24,15 @@ namespace DBTransferProject.AIServices
         private readonly CategorizationAgent _categorizationAgent;
         private readonly SentimentAnalysisAgent _sentimentAnalysisAgent;
         private readonly EntityExtractionAgent _entityExtractionAgent;
-
+        private readonly ImportantInformationExtractionAgent _importantInformationExtractionAgent;
+        private readonly ActionSelectionAgent _actionSelectionAgent;
         public AgentOrchestrator(
             CategorizationAgent categorizationAgent,
             SentimentAnalysisAgent sentimentAnalysisAgent,
             EntityExtractionAgent entityExtractionAgent,
+            ImportantInformationExtractionAgent importantInformationExtractionAgent,
+            ActionSelectionAgent actionSelectionAgent,
+            TrackingInfoAgent trackingInfoAgent,
             // remove this when done v
             ValidationAgent validationAgent,
             ILogger<AgentOrchestrator> logger,
@@ -36,6 +42,9 @@ namespace DBTransferProject.AIServices
             _categorizationAgent = categorizationAgent;
             _sentimentAnalysisAgent = sentimentAnalysisAgent;
             _entityExtractionAgent = entityExtractionAgent;
+            _importantInformationExtractionAgent = importantInformationExtractionAgent;
+            _actionSelectionAgent = actionSelectionAgent;
+            _trackingInfoAgent = trackingInfoAgent;
             // remove validation agent once done
             _validationAgent = validationAgent;
             _logger = logger;
@@ -49,15 +58,15 @@ namespace DBTransferProject.AIServices
             {
                 var categoryResult = await _categorizationAgent.ProcessAsync(emailContent);
                 var sentimentResult = await _sentimentAnalysisAgent.ProcessAsync(emailContent);
-                var keywordsResult = await GetKeywordsResultAsync(emailContent);
-                var importantInfoResult = await GetImportantInfoResultAsync(emailContent);
-                var recommendedActionResult = await GetRecommendedActionResultAsync(emailContent);
+                var keywordsResult = await _entityExtractionAgent.ProcessAsync(emailContent);
+                var importantInfoResult = await _importantInformationExtractionAgent.ProcessAsync(emailContent);
+                //var recommendedActionResult = await GetRecommendedActionResultAsync(emailContent);
 
-                _logger.LogInformation("Category Result: {categoryResult}", categoryResult);
+                _logger.LogInformation("Category Result Orchestrator: {categoryResult}", categoryResult);
                 _logger.LogInformation("Sentiment Result: {sentimentResult}", sentimentResult);
                 _logger.LogInformation("Keywords Result: {keywordsResult}", keywordsResult);
                 _logger.LogInformation("Important Info Result: {importantInfoResult}", importantInfoResult);
-                _logger.LogInformation("Recommended Action Result: {recommendedActionResult}", recommendedActionResult);
+                //_logger.LogInformation("Recommended Action Result: {recommendedActionResult}", recommendedActionResult);
 
                 double totalCost = 0;
 
@@ -69,59 +78,26 @@ namespace DBTransferProject.AIServices
                     ImportantInformation = ParseImportantInformation(JObject.Parse(importantInfoResult)),
                     Cost = totalCost
                 };
-                // Instantiate EntityValidator with logging
-                var validationAgent = _serviceProvider.GetRequiredService<EntityValidator>();
-
-                // Validate keywords
-                bool isValid = validationAgent.ValidateKeywords(emailContent, aiResponse);
-                _logger.LogInformation("*********VALIDATION Result: {validationResult}", isValid);
-
+             
 
                 // Add costs from each agent's response
                 totalCost += JObject.Parse(categoryResult)?["Cost"]?.ToObject<double>() ?? 0.0;
                 totalCost += JObject.Parse(sentimentResult)?["Cost"]?.ToObject<double>() ?? 0.0;
                 totalCost += JObject.Parse(keywordsResult)?["Cost"]?.ToObject<double>() ?? 0.0;
                 totalCost += JObject.Parse(importantInfoResult)?["Cost"]?.ToObject<double>() ?? 0.0;
-                totalCost += JObject.Parse(recommendedActionResult)?["Cost"]?.ToObject<double>() ?? 0.0;
+                //totalCost += JObject.Parse(recommendedActionResult)?["Cost"]?.ToObject<double>() ?? 0.0;
 
                 aiResponse.Cost = totalCost;
 
-                // Check if the email category is "Order Inquiry" or "Shipping and Delivery"
-                if (!string.IsNullOrEmpty(aiResponse.Keywords.TrackingNumber) && !string.IsNullOrEmpty(aiResponse.Keywords.Carrier) &&
-                    !aiResponse.Keywords.TrackingNumber.Contains("N/A"))
-                {
-                    // Split the tracking numbers into an array
-                    var trackingNumbers = aiResponse.Keywords.TrackingNumber.Split(',').Select(x => x.Trim()).ToArray();
+                // after email has been processed and the intention of the email has been retrieved 
+                aiResponse = await _actionSelectionAgent.ProcessAsync(aiResponse);
 
-                    // Process each tracking number separately
-                    foreach (var trackingNumber in trackingNumbers)
-                    {
-                        var trackingInfo = new
-                        {
-                            Carrier = aiResponse.Keywords.Carrier,
-                            TrackingNumber = trackingNumber
-                        };
 
-                        var trackingResult = await _carrierTrackingAgent.GetFedExTrackingInfoAsync(trackingNumber);
-
-                        aiResponse.TrackingResults.Add(new TrackingInformation
-                        {
-                            TrackingNumber = trackingNumber,
-                            Carrier = aiResponse.Keywords.Carrier,
-                            TrackingResult = trackingResult
-                        });
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("Tracking number or carrier not found for email category: {Category}", aiResponse.Category);
-                }
-
-                // Parse the recommended action
-                var recommendedActionJson = JObject.Parse(recommendedActionResult.Trim());
-                var recommendedAction = recommendedActionJson["RecommendedAction"];
-                aiResponse.Action = recommendedAction?["Action"]?.ToString() ?? string.Empty;
-                aiResponse.EmailPrompt = recommendedAction?["Prompt"]?.ToString() ?? string.Empty;
+                //// Parse the recommended action
+                //var recommendedActionJson = JObject.Parse(recommendedActionResult.Trim());
+                //var recommendedAction = recommendedActionJson["RecommendedAction"];
+                //aiResponse.Action = recommendedAction?["Action"]?.ToString() ?? string.Empty;
+                //aiResponse.EmailPrompt = recommendedAction?["Prompt"]?.ToString() ?? string.Empty;
 
                 return JsonConvert.SerializeObject(aiResponse);
             }
@@ -136,17 +112,6 @@ namespace DBTransferProject.AIServices
         {
             return await _categorizationAgent.ProcessAsync(emailContent);
         }
-
-        public async Task<string> GetKeywordsResultAsync(string emailContent)
-        {
-            return await _validationAgent.ValidateAndGetResponseAsync(() => _validationAgent.EntityExtractionAgent.ProcessAsync(emailContent));
-        }
-
-        public async Task<string> GetImportantInfoResultAsync(string emailContent)
-        {
-            return await _validationAgent.ValidateAndGetResponseAsync(() => _validationAgent.ImportantInformationExtractionAgent.ProcessAsync(emailContent));
-        }
-
         public async Task<string> GetRecommendedActionResultAsync(string emailContent)
         {
             return await _validationAgent.ValidateAndGetResponseAsync(() => _validationAgent.RecommendedActionAgent.ProcessAsync(emailContent));
@@ -203,6 +168,25 @@ namespace DBTransferProject.AIServices
             }
 
             return new List<string>();
+        }
+
+        public async Task<(bool IsTrackingRequest, double ConfidenceLevel)> CheckForTrackingRequestAsync(string emailContent)
+        {
+            var trackingResultJson = await _trackingInfoAgent.ProcessAsync(emailContent);
+            var trackingResult = JsonDocument.Parse(trackingResultJson).RootElement;
+
+            if (trackingResult.TryGetProperty("Result", out var resultElement))
+            {
+                if (resultElement.TryGetProperty("IsTrackingRequest", out var isTrackingRequestElement) &&
+                    resultElement.TryGetProperty("ConfidenceLevel", out var confidenceLevelElement))
+                {
+                    var isTrackingRequest = isTrackingRequestElement.GetString() == "Yes";
+                    var confidenceLevel = confidenceLevelElement.GetDouble();
+                    return (isTrackingRequest, confidenceLevel);
+                }
+            }
+
+            throw new KeyNotFoundException("The necessary keys were not present in the JSON response.");
         }
     }
 }

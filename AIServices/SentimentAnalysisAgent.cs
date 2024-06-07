@@ -19,10 +19,8 @@ namespace DBTransferProject.AIServices
         
         Here are the messages to analyze:
         {input}
-
         return the result in one word
         ";
-
         private static readonly HashSet<string> ValidSentiments = new HashSet<string>
         {
             "Positive",
@@ -40,11 +38,13 @@ namespace DBTransferProject.AIServices
         public async Task<string> ProcessAsync(string input)
         {
             var prompt = SystemMessage.Replace("{input}", input);
-            // Tokenize the input prompt
             int inputTokens = GPT3Tokenizer.Encode(prompt).Count;
             var sentiment = string.Empty;
             int retryCount = 0;
             const int maxRetries = 3;
+
+            int totalInputTokens = 0;
+            int totalOutputTokens = 0;
 
             while (retryCount < maxRetries && string.IsNullOrEmpty(sentiment))
             {
@@ -64,8 +64,15 @@ namespace DBTransferProject.AIServices
                     {
                         _logger.LogWarning("Invalid sentiment detected: {sentiment}", sentiment);
                         sentiment = string.Empty;
-                        retryCount++;
                     }
+                    else
+                    {
+                        int outputTokens = GPT3Tokenizer.Encode(sentiment).Count;
+                        totalInputTokens += inputTokens;
+                        totalOutputTokens += outputTokens;
+                    }
+
+                    retryCount++;
                 }
                 catch (Exception ex)
                 {
@@ -81,13 +88,9 @@ namespace DBTransferProject.AIServices
                 throw new InvalidOperationException(errorMessage);
             }
 
-            // Calculate the cost of the API call
-            var modelName = "gpt-3.5-turbo-0125"; // Replace with the actual model name if different
-            // Tokenize the output text
-            int outputTokens = GPT3Tokenizer.Encode(sentiment).Count;
-            var cost = _costTracker.CalculateCost(modelName, inputTokens, outputTokens);
+            var modelName = "gpt-3.5-turbo-1106";
+            var cost = _costTracker.CalculateCost(modelName, totalInputTokens, totalOutputTokens);
 
-            // Return the sentiment and cost as a JSON string
             return $"{{\"Sentiment\":\"{sentiment}\",\"Cost\":{cost}}}";
         }
     }

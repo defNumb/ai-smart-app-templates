@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Net.Http.Headers;
 using DBTransferProject.Models;
+using System.Text.RegularExpressions;
 namespace DBTransferProject.AIServices
 {
     public class CarrierTrackingAgent : IAIServiceAgent
@@ -29,10 +30,22 @@ namespace DBTransferProject.AIServices
                 var carrier = trackingInfo["Carrier"]?.ToString();
                 var trackingNumber = trackingInfo["TrackingNumber"]?.ToString();
 
-                if (string.IsNullOrEmpty(carrier) || string.IsNullOrEmpty(trackingNumber))
+                if (string.IsNullOrEmpty(trackingNumber))
                 {
-                    _logger.LogWarning("Carrier or tracking number is missing in the input: {input}", input);
+                    _logger.LogWarning("Tracking number is missing in the input: {input}", input);
                     return string.Empty;
+                }
+
+                // If the carrier is not specified, determine it based on the tracking number
+                if (string.IsNullOrEmpty(carrier))
+                {
+                    carrier = DetermineCarrier(trackingNumber);
+
+                    if (carrier == null)
+                    {
+                        _logger.LogWarning("Unable to determine carrier for tracking number: {trackingNumber}", trackingNumber);
+                        return string.Empty;
+                    }
                 }
 
                 switch (carrier.ToLower())
@@ -43,13 +56,11 @@ namespace DBTransferProject.AIServices
 
                     case "ups":
                         var upsTrackingResult = await GetUPSTrackingInfoAsync(trackingNumber);
-                        return JsonConvert.SerializeObject(upsTrackingResult);
+                        return upsTrackingResult;
 
                     case "usps":
                         var uspsTrackingResult = await GetUSPSTrackingInfoAsync(trackingNumber);
-                        return JsonConvert.SerializeObject(uspsTrackingResult);
-
-                    // Add more carriers as needed
+                        return uspsTrackingResult;
 
                     default:
                         _logger.LogWarning("Unsupported carrier: {carrier}", carrier);
@@ -62,7 +73,29 @@ namespace DBTransferProject.AIServices
                 throw;
             }
         }
+        private string DetermineCarrier(string trackingNumber)
+        {
+            // Check for FedEx tracking number pattern
+            if (Regex.IsMatch(trackingNumber, @"^\d{12,15}$"))
+            {
+                return "FedEx";
+            }
 
+            // Check for UPS tracking number pattern
+            if (Regex.IsMatch(trackingNumber, @"^1Z[A-Z0-9]{16}$"))
+            {
+                return "UPS";
+            }
+
+            // Check for USPS tracking number pattern
+            if (Regex.IsMatch(trackingNumber, @"^\d{20,22}$"))
+            {
+                return "USPS";
+            }
+
+            // If no pattern matches, return null
+            return null;
+        }
 
         // ************************************************************************************
         //**************************** FEDEX TRACKING *****************************************

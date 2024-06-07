@@ -98,6 +98,9 @@ namespace DBTransferProject.AIServices
             int retryCount = 0;
             const int maxRetries = 3;
 
+            int totalInputTokens = 0;
+            int totalOutputTokens = 0;
+
             while (retryCount < maxRetries && category == null)
             {
                 try
@@ -111,6 +114,11 @@ namespace DBTransferProject.AIServices
 
                     var response = result.Completions[0].Text.Trim();
                     category = ValidateAndCleanResponse(response);
+
+                    int outputTokens = GPT3Tokenizer.Encode(response).Count;
+                    totalInputTokens += inputTokens;
+                    totalOutputTokens += outputTokens;
+
                     retryCount++;
                 }
                 catch (Exception ex)
@@ -127,9 +135,8 @@ namespace DBTransferProject.AIServices
                 throw new InvalidOperationException(errorMessage);
             }
 
-            int outputTokens = GPT3Tokenizer.Encode(category).Count;
-            var modelName = "gpt-3.5-turbo-0125";
-            var cost = _costTracker.CalculateCost(modelName, inputTokens, outputTokens);
+            var modelName = "gpt-3.5-turbo-1106";
+            var cost = _costTracker.CalculateCost(modelName, totalInputTokens, totalOutputTokens);
 
             return $"{{\"Category\":\"{category}\",\"Cost\":{cost}}}";
         }
