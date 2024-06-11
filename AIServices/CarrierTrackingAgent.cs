@@ -26,40 +26,27 @@ namespace DBTransferProject.AIServices
         {
             try
             {
-                var trackingInfo = JObject.Parse(input);
-                var carrier = trackingInfo["Carrier"]?.ToString();
-                var trackingNumber = trackingInfo["TrackingNumber"]?.ToString();
+                string carrier = DetermineCarrier(input);
 
-                if (string.IsNullOrEmpty(trackingNumber))
+                if (carrier == null)
                 {
-                    _logger.LogWarning("Tracking number is missing in the input: {input}", input);
+                    _logger.LogWarning("Unable to determine carrier for tracking number: {trackingNumber}", input);
                     return string.Empty;
                 }
-
-                // If the carrier is not specified, determine it based on the tracking number
-                if (string.IsNullOrEmpty(carrier))
-                {
-                    carrier = DetermineCarrier(trackingNumber);
-
-                    if (carrier == null)
-                    {
-                        _logger.LogWarning("Unable to determine carrier for tracking number: {trackingNumber}", trackingNumber);
-                        return string.Empty;
-                    }
-                }
+              
 
                 switch (carrier.ToLower())
                 {
                     case "fedex":
-                        var fedExTrackingResult = await GetFedExTrackingInfoAsync(trackingNumber);
+                        var fedExTrackingResult = await GetFedExTrackingInfoAsync(input);
                         return JsonConvert.SerializeObject(fedExTrackingResult);
 
                     case "ups":
-                        var upsTrackingResult = await GetUPSTrackingInfoAsync(trackingNumber);
+                        var upsTrackingResult = await GetUPSTrackingInfoAsync(input);
                         return upsTrackingResult;
 
                     case "usps":
-                        var uspsTrackingResult = await GetUSPSTrackingInfoAsync(trackingNumber);
+                        var uspsTrackingResult = await GetUSPSTrackingInfoAsync(input);
                         return uspsTrackingResult;
 
                     default:
@@ -69,11 +56,11 @@ namespace DBTransferProject.AIServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while processing tracking information: {input}", input);
+                _logger.LogError(ex, "CarrierTrackingAAn error occurred while processing tracking information: {input}", input);
                 throw;
             }
         }
-        private string DetermineCarrier(string trackingNumber)
+        public string DetermineCarrier(string trackingNumber)
         {
             // Check for FedEx tracking number pattern
             if (Regex.IsMatch(trackingNumber, @"^\d{12,15}$"))

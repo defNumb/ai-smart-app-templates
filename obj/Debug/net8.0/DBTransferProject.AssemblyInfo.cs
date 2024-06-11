@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DBTransferProject")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5850e71bf5cf916dcf8331e41e7bd5967713d994")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a2e458a4fc3f831330e9ea73afd3735b28d9ee2")]
 [assembly: System.Reflection.AssemblyProductAttribute("DBTransferProject")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DBTransferProject")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

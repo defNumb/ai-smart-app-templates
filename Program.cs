@@ -1,25 +1,19 @@
-using DBTransferProject.Components;
-using DBTransferProject.Services;
-using OpenAI_API;
-using DBTransferProject.Hubs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using Azure.AI.TextAnalytics;
-using Azure;
+using AI_RAG_Excelligence.Interfaces;
+using AI_RAG_Excelligence.Services;
 using DBTransferProject.AIServices;
-using System.Net.Http;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-
+using DBTransferProject.Components;
+using DBTransferProject.Hubs;
+using DBTransferProject.Services;
+using Microsoft.AspNetCore.Mvc;
+using OpenAI_API;
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("https://localhost:8080", "http://localhost:8081");
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddHttpClient(); 
-// Add Kustomer API token to configuration
-//var kustomerApiToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NDY1YTE4NGViNDhkNzlhNzJmNWIyYSIsInVzZXIiOiI2NjQ2NWExODAzNDFiMTA0MWQzNmI3NDgiLCJvcmciOiI1ZDAyZTNjODcxMmQ0YzAwMWE2ZjhkZjIiLCJvcmdOYW1lIjoiZGlzY291bnRzY2hvb2xzdXBwbHkiLCJ1c2VyVHlwZSI6Im1hY2hpbmUiLCJwb2QiOiJwcm9kMSIsInJvbGVzIjpbIm9yZy51c2VyLmNvbnZlcnNhdGlvbi5yZWFkIiwib3JnLnVzZXIubWVzc2FnZS5yZWFkIl0sImV4cCI6MTcxNjQ5MTQxNSwiYXVkIjoidXJuOmNvbnN1bWVyIiwiaXNzIjoidXJuOmFwaSIsInN1YiI6IjY2NDY1YTE4MDM0MWIxMDQxZDM2Yjc0OCJ9.xnVnOuZC89Xnp2XMb7v1xByhQbWjo0NE7AInDUwiZnw";
+builder.Services.AddHttpClient();
 
 // Register HttpClient as a Singleton
 builder.Services.AddSingleton(sp =>
@@ -32,6 +26,23 @@ builder.Services.AddSingleton(sp =>
 
 // Register KustomerService
 builder.Services.AddScoped<KustomerService>();
+
+// Register RAG services
+builder.Services.AddSingleton<IVectorStore, PineconeService>(provider =>
+{
+    var logger = provider.GetRequiredService<ILogger<PineconeService>>();
+    return new PineconeService("592dfabf-9066-48e2-89b1-0e57b9545bab", "https://excelligence-training-data-32583iz.svc.aped-4627-b74a.pinecone.io", logger);
+});
+builder.Services.AddSingleton<IAugmentationService, AugmentationService>(provider =>
+    new AugmentationService("sk-proj-EqLbkqkRasBapsJfHeXaT3BlbkFJXwdnHNd3bre1NwERq5Er"));
+builder.Services.AddSingleton<EmbeddingsService>(provider =>
+    new EmbeddingsService("sk-proj-EqLbkqkRasBapsJfHeXaT3BlbkFJXwdnHNd3bre1NwERq5Er"));
+builder.Services.AddSingleton<IRetrievalService, RetrievalService>();
+
+// Register dependent services
+builder.Services.AddTransient<EntityExtractionAgent>();
+builder.Services.AddTransient<ValidationAgent>();
+builder.Services.AddTransient<AgentOrchestrator>();
 
 // Register AI Service Agents
 builder.Services.AddSingleton<OpenAIAPI>(sp => new OpenAIAPI("sk-proj-EqLbkqkRasBapsJfHeXaT3BlbkFJXwdnHNd3bre1NwERq5Er"));
@@ -47,6 +58,8 @@ builder.Services.AddTransient<ValidationAgent>();
 builder.Services.AddTransient<CostTracker>();
 builder.Services.AddTransient<ActionSelectionAgent>();
 builder.Services.AddTransient<FilterAgent>();
+builder.Services.AddTransient<MockJDAService>();
+
 // Register Agent Orchestrator
 builder.Services.AddTransient<AgentOrchestrator>();
 
@@ -97,3 +110,4 @@ app.MapControllers();
 app.MapHub<KustomerHub>("/kustomerHub");
 
 app.Run();
+

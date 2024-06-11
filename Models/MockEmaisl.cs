@@ -75,8 +75,8 @@ namespace DBTransferProject.Models
                     Id = Guid.NewGuid().ToString(),
                     Attributes = new ApiConversationAttributes
                     {
-                        Name = "Missing Items in Order #67890",
-                        Preview = "Dear customer service, I just received my order #67890, but unfortunately, some items are missing. I double-checked the packing slip, and it seems that you forgot to include two out of the five items I ordered. Can you please look into this and send me the missing items as soon as possible? Let me know if you need any further information from me.",
+                        Name = "Order not received yet",
+                        Preview = "hi, we ordered a couple items last week and we have not received the items yet, could you possibly give us any tracking info for P3989567 and W3923467",
                         Status = "open"
                     },
                     Messages = new List<ApiMessage>
@@ -87,8 +87,8 @@ namespace DBTransferProject.Models
                             Attributes = new ApiMessagesAttributes
                             {
                                 SentAt = DateTime.Now.AddMinutes(-90),
-                                Subject = "Missing Items in Order #67890",
-                                Preview = "Dear customer service, I just received my order #67890, but unfortunately, some items are missing. I double-checked the packing slip, and it seems that you forgot to include two out of the five items I ordered. Can you please look into this and send me the missing items as soon as possible? Let me know if you need any further information from me.",
+                                Subject = "Order not received yet",
+                                Preview = "hi, we ordered a couple items last week and we have not received the items yet, could you possibly give us any tracking info for P3989567 and W3923467",
                             Meta = new ApiMessagesMeta
                                 {
                                     From = "customer_email@mail.com"

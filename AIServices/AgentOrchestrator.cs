@@ -62,10 +62,10 @@ namespace DBTransferProject.AIServices
                 var importantInfoResult = await _importantInformationExtractionAgent.ProcessAsync(emailContent);
                 //var recommendedActionResult = await GetRecommendedActionResultAsync(emailContent);
 
-                _logger.LogInformation("Category Result Orchestrator: {categoryResult}", categoryResult);
-                _logger.LogInformation("Sentiment Result: {sentimentResult}", sentimentResult);
-                _logger.LogInformation("Keywords Result: {keywordsResult}", keywordsResult);
-                _logger.LogInformation("Important Info Result: {importantInfoResult}", importantInfoResult);
+                //_logger.LogInformation("Category Result Orchestrator: {categoryResult}", categoryResult);
+                //_logger.LogInformation("Sentiment Result: {sentimentResult}", sentimentResult);
+                //_logger.LogInformation("Keywords Result: {keywordsResult}", keywordsResult);
+                //_logger.LogInformation("Important Info Result: {importantInfoResult}", importantInfoResult);
                 //_logger.LogInformation("Recommended Action Result: {recommendedActionResult}", recommendedActionResult);
 
                 double totalCost = 0;
@@ -124,12 +124,12 @@ namespace DBTransferProject.AIServices
                 var entities = JObject.Parse(keywordsResult)["Entities"];
                 return new Keywords
                 {
-                    AccountNumber = entities?["AccountNumber"]?.ToString() ?? string.Empty,
-                    PoNumber = entities?["PoNumber"]?.ToString() ?? string.Empty,
+                    AccountNumber = ConvertToList(entities?["AccountNumber"]),
+                    PoNumber = ConvertToList(entities?["PoNumber"]),
                     ItemNumber = ConvertToList(entities?["ItemNumber"]),
                     OrderNumber = ConvertToList(entities?["OrderNumber"]),
-                    TrackingNumber = entities?["TrackingNumber"]?.ToString() ?? string.Empty,
-                    Carrier = entities?["Carrier"]?.ToString() ?? string.Empty
+                    TrackingNumber = ConvertToList(entities?["TrackingNumber"]),
+                    Carrier = ConvertToList(entities?["Carrier"])
                 };
             }
             catch (JsonReaderException ex)

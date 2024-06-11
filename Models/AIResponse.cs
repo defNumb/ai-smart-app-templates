@@ -16,13 +16,13 @@
 
     public class Keywords
     {
-        public string AccountNumber { get; set; } = string.Empty;
-        public string PoNumber { get; set; } = string.Empty;
+        public List<string> AccountNumber { get; set; } = new List<string>();
+        public List<string> PoNumber { get; set; } = new List<string>();
         public List<string> ItemNumber { get; set; } = new List<string>();
-        public string OrderConfirmation { get; set; } = string.Empty;
-        public List<string> OrderNumber { get; set; } = new List<string>();
-        public string TrackingNumber { get; set; } = string.Empty;
-        public string Carrier { get; set; } = string.Empty;
+        public List<string> OrderConfirmation { get; set; } = new List<string>();
+        public List<string> OrderNumber { get; set; }
+        public List<string> TrackingNumber { get; set; } = new List<string>();
+        public List<string> Carrier { get; set; } = new List<string>();
     }
 
     public class ImportantInformation

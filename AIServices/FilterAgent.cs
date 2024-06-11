@@ -58,27 +58,28 @@ public class FilterAgent
     {
         var disclaimerPatterns = new[]
         {
-            @"Note: This e-mail may contain privileged and confidential information.*",
-            @"This email message and any files transmitted are sent with confidentiality in mind.*",
-            @"CONFIDENTIAL NOTICE AND DISCLAIMER.*",
-            @"Disclaimer.*",
-            @"CONFIDENTIALITY NOTICE and DISCLAIMER:.*",
-            @"DISCLAIMER\s*-.*",
-            @"The content of this message \(email and attachments\) is confidential.*",
-            @"This email and any attachments are intended solely for the use of the individual.*",
-            @"If you have received this communication in error, please notify us immediately.*",
-            @"We do not guarantee that this material is free from viruses.*",
-            @"This e-mail message together with any attachment or reply should not be considered private.*",
-            @"The information contained in this communication from the sender is confidential.*",
-            @"This email has been scanned for viruses and malware.*",
-            @"You should have no expectation that the content of emails sent to or from school district email addresses will remain private.*",
-            @"The document\(s\) accompanying this electronic transmission contain confidential information belonging to the sender which is legally privileged.*",
-            @"The content of this email is confidential and intended for the recipient specified in message only.*",
-            @"Hallsville ISD puts the security of the client at a high priority.*",
-            @"Hallsville Independent School District.*",
-            @"This email and any attachments to it may be confidential and are intended solely for the use of the individual to whom it is addressed.*",
-            @"Please note Florida has a very broad public records law.*"
-        };
+        @"Note: This e-mail may contain privileged and confidential information.*",
+        @"This email message and any files transmitted are sent with confidentiality in mind.*",
+        @"CONFIDENTIAL NOTICE AND DISCLAIMER.*",
+        @"Disclaimer.*",
+        @"CONFIDENTIALITY NOTICE and DISCLAIMER:.*",
+        @"DISCLAIMER\s*-.*",
+        @"The content of this message \(email and attachments\) is confidential.*",
+        @"This email and any attachments are intended solely for the use of the individual.*",
+        @"If you have received this communication in error, please notify us immediately.*",
+        @"We do not guarantee that this material is free from viruses.*",
+        @"This e-mail message together with any attachment or reply should not be considered private.*",
+        @"The information contained in this communication from the sender is confidential.*",
+        @"This email has been scanned for viruses and malware.*",
+        @"You should have no expectation that the content of emails sent to or from school district email addresses will remain private.*",
+        @"The document\(s\) accompanying this electronic transmission contain confidential information belonging to the sender which is legally privileged.*",
+        @"The content of this email is confidential and intended for the recipient specified in message only.*",
+        @"Hallsville ISD puts the security of the client at a high priority.*",
+        @"Hallsville Independent School District.*",
+        @"This email and any attachments to it may be confidential and are intended solely for the use of the individual to whom it is addressed.*",
+        @"Please note Florida has a very broad public records law.*",
+        @"This e-mail and any attachments are intended only for the named recipient\(s\) and may contain information that is legally privileged, confidential, or exempt from disclosure under applicable law\. If you have received this message in error, or are not the named recipient\(s\), you may not retain, copy or use this e-mail or any attachment for any purpose or disclose all or any part of the contents to any other person\. Any such dissemination, distribution or copying of this e-mail or its attachments is strictly prohibited\. Please immediately notify the sender and permanently delete this e-mail and any attachment from your computer\.*"
+    };
 
         foreach (var pattern in disclaimerPatterns)
         {
@@ -87,6 +88,7 @@ public class FilterAgent
 
         return body;
     }
+
 
 
     private string RemovePersonalQuotes(string body)

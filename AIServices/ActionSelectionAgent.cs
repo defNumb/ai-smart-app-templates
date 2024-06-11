@@ -1,4 +1,7 @@
 ﻿using DBTransferProject.Models;
+using DBTransferProject.Services;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace DBTransferProject.AIServices
 {
@@ -6,11 +9,13 @@ namespace DBTransferProject.AIServices
     {
         private readonly ILogger<ActionSelectionAgent> _logger;
         private readonly CarrierTrackingAgent _carrierTrackingAgent;
+        private readonly MockJDAService _mockJDAService;
 
-        public ActionSelectionAgent(ILogger<ActionSelectionAgent> logger, CarrierTrackingAgent carrierTrackingAgent)
+        public ActionSelectionAgent(ILogger<ActionSelectionAgent> logger, CarrierTrackingAgent carrierTrackingAgent, MockJDAService mockJDAService)
         {
             _logger = logger;
             _carrierTrackingAgent = carrierTrackingAgent;
+            _mockJDAService = mockJDAService;
         }
 
         public async Task<AIResponse> ProcessAsync(AIResponse aiResponse)
@@ -34,37 +39,66 @@ namespace DBTransferProject.AIServices
 
         private async Task<AIResponse> HandleTrackingInformationAsync(AIResponse aiResponse)
         {
-            if (!string.IsNullOrEmpty(aiResponse.Keywords.TrackingNumber) && !string.IsNullOrEmpty(aiResponse.Keywords.Carrier) &&
-                !aiResponse.Keywords.TrackingNumber.Contains("N/A"))
+            if (aiResponse.Keywords.TrackingNumber.Count > 0 && !aiResponse.Keywords.TrackingNumber.Contains("N/A"))
             {
                 // Split the tracking numbers into an array
-                var trackingNumbers = aiResponse.Keywords.TrackingNumber.Split(',').Select(x => x.Trim()).ToArray();
+                var trackingNumbers = aiResponse.Keywords.TrackingNumber;
 
                 // Process each tracking number separately
                 foreach (var trackingNumber in trackingNumbers)
                 {
-                    var trackingInfo = new
-                    {
-                        Carrier = aiResponse.Keywords.Carrier,
-                        TrackingNumber = trackingNumber
-                    };
+                    var trackingResult = await _carrierTrackingAgent.ProcessAsync(trackingNumber);
 
-                    var trackingResult = await _carrierTrackingAgent.GetFedExTrackingInfoAsync(trackingNumber);
+                    var carrier = _carrierTrackingAgent.DetermineCarrier(trackingNumber);
+                    TrackingResult trackingConResult = JsonConvert.DeserializeObject<TrackingResult>(trackingResult);
 
                     aiResponse.TrackingResults.Add(new TrackingInformation
                     {
                         TrackingNumber = trackingNumber,
-                        Carrier = aiResponse.Keywords.Carrier,
-                        TrackingResult = trackingResult
+                        Carrier = carrier,
+                        TrackingResult = trackingConResult
+
                     });
+                }
+            }
+            // Check for and process order numbers
+            else if (aiResponse.Keywords.OrderNumber != null && aiResponse.Keywords.OrderNumber.Count > 0)
+            {
+                
+                foreach (var orderNumber in aiResponse.Keywords.OrderNumber)
+                {
+                    OrderInfo orderInfo = _mockJDAService.GetOrderInfo(orderNumber);
+                    string trackingNumber = orderInfo.TrackingNumber;
+
+                    if (orderInfo != null && !string.IsNullOrEmpty(trackingNumber))
+                    {
+                        var trackingResult = await _carrierTrackingAgent.ProcessAsync(trackingNumber);
+                        var carrier = _carrierTrackingAgent.DetermineCarrier(trackingNumber);
+                        TrackingResult trackingConResult = JsonConvert.DeserializeObject<TrackingResult>(trackingResult);
+
+                        aiResponse.TrackingResults.Add(new TrackingInformation
+                        {
+                            TrackingNumber =  trackingNumber,
+                            Carrier = carrier,
+                            TrackingResult = trackingConResult
+                            
+                        });
+
+
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Order number {OrderNumber} found but no tracking number available in the JDA order data.", orderNumber);
+                    }
                 }
             }
             else
             {
-                _logger.LogWarning("Tracking number or carrier not found for email category: {Category}", aiResponse.Category);
+                _logger.LogWarning("Tracking number or order number not found for email category: {Category}", aiResponse.Category);
             }
 
             return aiResponse;
         }
+
     }
 }

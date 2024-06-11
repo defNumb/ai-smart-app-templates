@@ -124,8 +124,38 @@
                         <div>
                             <strong>Keywords:</strong>
                             <ul>
-                                <li><strong>Account Number:</strong> @aiResponse.Keywords.AccountNumber</li>
-                                <li><strong>PO Number:</strong> @aiResponse.Keywords.PoNumber</li>
+                                <li>
+                                    <strong>Account Number:</strong>
+                                    @if (aiResponse.Keywords.AccountNumber != null && aiResponse.Keywords.AccountNumber.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var account in aiResponse.Keywords.AccountNumber)
+                                            {
+                                                <li>@account</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </li>
+                                <li>
+                                    <strong>PO Number:</strong>
+                                    @if (aiResponse.Keywords.PoNumber != null && aiResponse.Keywords.PoNumber.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var po in aiResponse.Keywords.PoNumber)
+                                            {
+                                                <li>@po</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </li>
                                 <li>
                                     <strong>Item Numbers:</strong>
                                     @if (aiResponse.Keywords.ItemNumber != null && aiResponse.Keywords.ItemNumber.Any())
@@ -142,7 +172,22 @@
                                         <p></p>
                                     }
                                 </li>
-                                <li><strong>Order Confirmation:</strong> @aiResponse.Keywords.OrderConfirmation</li>
+                                <li>
+                                    <strong>Order Confirmation:</strong>
+                                    @if (aiResponse.Keywords.OrderConfirmation != null && aiResponse.Keywords.OrderConfirmation.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var orderConfirmation in aiResponse.Keywords.OrderConfirmation)
+                                            {
+                                                <li>@orderConfirmation</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </li>
                                 <li>
                                     <strong>Order Numbers:</strong>
                                     @if (aiResponse.Keywords.OrderNumber != null && aiResponse.Keywords.OrderNumber.Any())
@@ -159,8 +204,38 @@
                                         <p></p>
                                     }
                                 </li>
-                                <li><strong>Tracking Number:</strong> @aiResponse.Keywords.TrackingNumber</li>
-                                <li><strong>Carrier:</strong> @aiResponse.Keywords.Carrier</li>
+                                <li>
+                                    <strong>Tracking Number:</strong>
+                                    @if (aiResponse.Keywords.TrackingNumber != null && aiResponse.Keywords.TrackingNumber.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var tracking in aiResponse.Keywords.TrackingNumber)
+                                            {
+                                                <li>@tracking</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </li>
+                                <li>
+                                    <strong>Carrier:</strong>
+                                    @if (aiResponse.Keywords.Carrier != null && aiResponse.Keywords.Carrier.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var carrier in aiResponse.Keywords.Carrier)
+                                            {
+                                                <li>@carrier</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </li>
                             </ul>
                         </div>
                         <div>
