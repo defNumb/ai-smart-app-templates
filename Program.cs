@@ -20,7 +20,7 @@ builder.Services.AddSingleton(sp =>
 {
     var httpClient = new HttpClient { BaseAddress = new Uri("https://api.kustomerapp.com") };
     httpClient.DefaultRequestHeaders.Add("accept", "application/json");
-    httpClient.DefaultRequestHeaders.Add("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NjFmYTFkNmFkMjRhMmUxMmM3ZGViNiIsInVzZXIiOiI2NjYxZmExZDkwYjEzMDRiNmIyN2U3Y2MiLCJvcmciOiI1ZDAyZTNjODcxMmQ0YzAwMWE2ZjhkZjIiLCJvcmdOYW1lIjoiZGlzY291bnRzY2hvb2xzdXBwbHkiLCJ1c2VyVHlwZSI6Im1hY2hpbmUiLCJwb2QiOiJwcm9kMSIsInJvbGVzIjpbIm9yZy51c2VyLmNvbnZlcnNhdGlvbi5yZWFkIiwib3JnLnVzZXIubWVzc2FnZS5yZWFkIl0sImV4cCI6MTcxODMwMTg1MywiYXVkIjoidXJuOmNvbnN1bWVyIiwiaXNzIjoidXJuOmFwaSIsInN1YiI6IjY2NjFmYTFkOTBiMTMwNGI2YjI3ZTdjYyJ9.Ipazd85fOHfVDyCqmLee1OpWoE0V8A7KrUIel_DxeXU");
+    httpClient.DefaultRequestHeaders.Add("authorization", "Bearer [KEYTOKEN]");
     return httpClient;
 });
 
@@ -31,12 +31,12 @@ builder.Services.AddScoped<KustomerService>();
 builder.Services.AddSingleton<IVectorStore, PineconeService>(provider =>
 {
     var logger = provider.GetRequiredService<ILogger<PineconeService>>();
-    return new PineconeService("592dfabf-9066-48e2-89b1-0e57b9545bab", "https://excelligence-training-data-32583iz.svc.aped-4627-b74a.pinecone.io", logger);
+    return new PineconeService("[KEYTOKEN]", "[URL]", logger);
 });
 builder.Services.AddSingleton<IAugmentationService, AugmentationService>(provider =>
-    new AugmentationService("sk-proj-EqLbkqkRasBapsJfHeXaT3BlbkFJXwdnHNd3bre1NwERq5Er"));
+    new AugmentationService("[KEYTOKEN]"));
 builder.Services.AddSingleton<EmbeddingsService>(provider =>
-    new EmbeddingsService("sk-proj-EqLbkqkRasBapsJfHeXaT3BlbkFJXwdnHNd3bre1NwERq5Er"));
+    new EmbeddingsService("[KEYTOKEN]"));
 builder.Services.AddSingleton<IRetrievalService, RetrievalService>();
 
 // Register dependent services
@@ -45,7 +45,7 @@ builder.Services.AddTransient<ValidationAgent>();
 builder.Services.AddTransient<AgentOrchestrator>();
 
 // Register AI Service Agents
-builder.Services.AddSingleton<OpenAIAPI>(sp => new OpenAIAPI("sk-proj-EqLbkqkRasBapsJfHeXaT3BlbkFJXwdnHNd3bre1NwERq5Er"));
+builder.Services.AddSingleton<OpenAIAPI>(sp => new OpenAIAPI("[KEYTOKEN]"));
 builder.Services.AddTransient<CategorizationAgent>();
 builder.Services.AddTransient<SentimentAnalysisAgent>();
 builder.Services.AddTransient<EntityExtractionAgent>();
